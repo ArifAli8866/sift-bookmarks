@@ -73,6 +73,6 @@ export async function POST(request: Request) {
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     console.error("Google auth error:", message);
-    return NextResponse.json({ error: "Failed to sign in with Google." }, { status: 500 });
+    return NextResponse.json({ error: message || "Failed to sign in with Google." }, { status: 500 });
   }
 }

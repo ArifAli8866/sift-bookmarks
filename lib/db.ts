@@ -52,8 +52,8 @@ async function getPglite() {
 export async function query<T = any>(sqlText: string, params: any[] = []): Promise<T[]> {
   const url = getDatabaseUrl();
   if (url) {
-    const sql = neon(url) as any;
-    const rows = await sql(sqlText, params);
+    const sql = neon(url);
+    const rows = await sql.query(sqlText, params);
     return rows as T[];
   } else {
     const pg = await getPglite();
@@ -70,14 +70,14 @@ export async function queryOne<T = any>(sqlText: string, params: any[] = []): Pr
 export async function exec(sqlText: string): Promise<void> {
   const url = getDatabaseUrl();
   if (url) {
-    const sql = neon(url) as any;
+    const sql = neon(url);
     // Split on semicolons that are not inside strings
     const statements = sqlText
       .split(/;(?=(?:[^']*'[^']*')*[^']*$)/)
       .map((s) => s.trim())
       .filter(Boolean);
     for (const stmt of statements) {
-      await sql(stmt);
+      await sql.query(stmt);
     }
   } else {
     const pg = await getPglite();
