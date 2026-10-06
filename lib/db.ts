@@ -136,6 +136,17 @@ export async function ensureTables(): Promise<void> {
           updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );
 
+        -- Ensure columns exist in case sift_bookmarks table was created in a previous version
+        ALTER TABLE sift_bookmarks ADD COLUMN IF NOT EXISTS user_id VARCHAR(64);
+        ALTER TABLE sift_bookmarks ADD COLUMN IF NOT EXISTS category_id VARCHAR(64);
+        ALTER TABLE sift_bookmarks ADD COLUMN IF NOT EXISTS description TEXT NOT NULL DEFAULT '';
+        ALTER TABLE sift_bookmarks ADD COLUMN IF NOT EXISTS icon_url TEXT;
+        ALTER TABLE sift_bookmarks ADD COLUMN IF NOT EXISTS is_favorite BOOLEAN NOT NULL DEFAULT FALSE;
+        ALTER TABLE sift_bookmarks ADD COLUMN IF NOT EXISTS position DOUBLE PRECISION NOT NULL DEFAULT 0;
+        ALTER TABLE sift_bookmarks ADD COLUMN IF NOT EXISTS last_opened_at TIMESTAMPTZ;
+        ALTER TABLE sift_bookmarks ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+        DELETE FROM sift_bookmarks WHERE user_id IS NULL;
+
         CREATE TABLE IF NOT EXISTS sift_user_settings (
           id VARCHAR(64) PRIMARY KEY,
           user_id VARCHAR(64) UNIQUE NOT NULL REFERENCES sift_users(id) ON DELETE CASCADE,

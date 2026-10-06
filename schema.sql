@@ -46,8 +46,18 @@ CREATE TABLE IF NOT EXISTS sift_bookmarks (
   position DOUBLE PRECISION NOT NULL DEFAULT 0,
   last_opened_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Ensure all columns exist in case sift_bookmarks existed from legacy schema
+ALTER TABLE sift_bookmarks ADD COLUMN IF NOT EXISTS user_id VARCHAR(64);
+ALTER TABLE sift_bookmarks ADD COLUMN IF NOT EXISTS category_id VARCHAR(64);
+ALTER TABLE sift_bookmarks ADD COLUMN IF NOT EXISTS description TEXT NOT NULL DEFAULT '';
+ALTER TABLE sift_bookmarks ADD COLUMN IF NOT EXISTS icon_url TEXT;
+ALTER TABLE sift_bookmarks ADD COLUMN IF NOT EXISTS is_favorite BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE sift_bookmarks ADD COLUMN IF NOT EXISTS position DOUBLE PRECISION NOT NULL DEFAULT 0;
+ALTER TABLE sift_bookmarks ADD COLUMN IF NOT EXISTS last_opened_at TIMESTAMPTZ;
+ALTER TABLE sift_bookmarks ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+DELETE FROM sift_bookmarks WHERE user_id IS NULL;
 
 -- 5. User settings / preferences table
 CREATE TABLE IF NOT EXISTS sift_user_settings (
