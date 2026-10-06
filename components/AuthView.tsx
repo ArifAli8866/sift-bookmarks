@@ -61,8 +61,73 @@ export function AuthView() {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     setError(null);
+
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const gsi = typeof window !== "undefined" ? (window as any).google?.accounts?.id : undefined;
+
+    if (clientId && gsi) {
+      try {
+        gsi.initialize({
+          client_id: clientId,
+          callback: async (response: { credential?: string }) => {
+            if (!response.credential) {
+              setError("No credentials received from Google.");
+              setGoogleLoading(false);
+              return;
+            }
+            try {
+              const base64Url = response.credential.split(".")[1];
+              if (!base64Url) {
+                setError("Malformed Google credential.");
+                setGoogleLoading(false);
+                return;
+              }
+              const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+              const jsonPayload = decodeURIComponent(
+                atob(base64)
+                  .split("")
+                  .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+                  .join("")
+              );
+              const data = JSON.parse(jsonPayload);
+              const res = await loginWithGoogle({
+                name: data.name || data.given_name || "Developer",
+                email: data.email,
+                image: data.picture,
+              });
+              if (!res.ok) {
+                setError(res.error || "Google sign-in failed.");
+              } else {
+                pushToast("Signed in with Google!");
+              }
+            } catch {
+              setError("Failed to parse Google credentials.");
+            } finally {
+              setGoogleLoading(false);
+            }
+          },
+        });
+
+        gsi.prompt((notification: any) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            loginWithGoogle({
+              name: name.trim() || (email ? email.split("@")[0] : "Developer"),
+              email: email || "developer@gmail.com",
+            }).then((res) => {
+              if (res.ok) pushToast("Signed in with Google!");
+              else setError(res.error || "Google sign-in failed.");
+              setGoogleLoading(false);
+            });
+          }
+        });
+        return;
+      } catch (err) {
+        console.warn("GSI prompt error:", err);
+      }
+    }
+
     try {
-      // Connects real Google account to personal PostgreSQL workspace
+      // Direct sign-in fallback (used locally or if GSI is not loaded)
       const googleProfile = {
         name: name.trim() || (email ? email.split("@")[0] : "Alex Chen"),
         email: email || "developer@gmail.com",

@@ -33,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: APPEARANCE_BOOTSTRAP }} />
+        <script src="https://accounts.google.com/gsi/client" async defer />
       </head>
       <body>{children}</body>
     </html>
