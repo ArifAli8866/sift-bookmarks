@@ -1,0 +1,618 @@
+/* =====================================================================
+   App frame — sidebar, unified toolbar, scroll region
+   ===================================================================== */
+
+.app {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  /* The row must be clamped, or a tall sidebar pushes the footer below the
+     fold and the scroller never gets a fixed height of its own. */
+  grid-template-rows: minmax(0, 1fr);
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--window);
+  transition: grid-template-columns var(--t-base) var(--ease-out);
+}
+
+.app[data-sidebar="collapsed"] {
+  grid-template-columns: 0px minmax(0, 1fr);
+}
+
+/* ------------------------------ sidebar ----------------------------- */
+
+.sidebar {
+  position: relative;
+  z-index: 3;
+  min-width: 0;
+  overflow: hidden;
+  background: var(--sidebar);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border-right: 0.5px solid var(--separator);
+  user-select: none;
+}
+
+.sidebar-inner {
+  display: flex;
+  flex-direction: column;
+  width: var(--sidebar-w);
+  height: 100%;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  height: var(--toolbar-h);
+  padding: 0 10px 0 14px;
+  flex: none;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.35), 0 1px 2px rgba(10, 90, 200, 0.3);
+}
+
+.brand-name {
+  font-size: var(--fs-base);
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  color: var(--text);
+}
+
+.brand-count {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-4);
+  letter-spacing: 0;
+}
+
+.sync-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: default;
+  user-select: none;
+}
+
+.sync-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--r-pill);
+  flex-shrink: 0;
+  background: var(--text-4);
+  transition: background var(--t-fast) var(--ease-out);
+}
+
+.sync-indicator.sync-synced {
+  background: var(--success);
+}
+
+.sync-indicator.sync-syncing {
+  background: var(--accent);
+  animation: pulse-sync 1.2s infinite ease-in-out;
+}
+
+.sync-indicator.sync-error {
+  background: var(--danger);
+}
+
+.sync-indicator.sync-local {
+  background: var(--text-4);
+}
+
+@keyframes pulse-sync {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.sidebar-scroll {
+  flex: 1;
+  min-height: 0;
+  padding: 2px 10px 12px;
+}
+
+.nav-section {
+  margin-top: 18px;
+}
+
+.nav-section:first-child {
+  margin-top: 4px;
+}
+
+.nav-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 20px;
+  padding: 0 6px;
+  margin-bottom: 3px;
+}
+
+.nav-head-label {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-micro);
+  font-weight: 590;
+  letter-spacing: 0.045em;
+  color: var(--text-3);
+}
+
+.nav-head .icon-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  opacity: 0;
+  transform: translateY(0.5px);
+  transition: opacity var(--t-micro) var(--ease-out), background-color var(--t-tint) var(--ease-out),
+    color var(--t-tint) var(--ease-out), transform var(--t-micro) var(--ease-out);
+}
+
+.nav-section:hover .nav-head .icon-btn,
+.nav-head .icon-btn:focus-visible {
+  opacity: 1;
+}
+
+.nav-head .icon-btn:hover {
+  background: var(--tint-strong);
+}
+
+.nav-head .icon-btn:active {
+  transform: scale(0.9);
+}
+
+.nav-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  width: 100%;
+  height: 28px;
+  padding: 0 7px;
+  border-radius: var(--r-row);
+  color: var(--text-2);
+  font-size: var(--fs-base);
+  letter-spacing: -0.011em;
+  transition: background-color var(--t-tint) var(--ease-out), color var(--t-tint) var(--ease-out),
+    box-shadow var(--t-micro) var(--ease-out);
+}
+
+.nav-row + .nav-row {
+  margin-top: 1px;
+}
+
+.nav-row:hover {
+  background: var(--tint-hover);
+  color: var(--text);
+}
+
+.nav-row:active {
+  background: var(--tint-press);
+  transition-duration: 40ms;
+}
+
+.nav-row[aria-current="page"] {
+  background: var(--accent);
+  color: var(--accent-on);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.22), 0 0.5px 2px rgba(10, 90, 200, 0.3);
+}
+
+.nav-row[aria-current="page"]:hover {
+  background: var(--accent-hover);
+  color: var(--accent-on);
+}
+
+.nav-row[aria-current="page"] .nav-count {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.nav-icon {
+  color: var(--text-3);
+  transition: color var(--t-tint) var(--ease-out);
+}
+
+.nav-row:hover .nav-icon {
+  color: var(--text-2);
+}
+
+.nav-row[aria-current="page"] .nav-icon {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.nav-label {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.nav-count {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-4);
+  letter-spacing: 0;
+  transition: color var(--t-tint) var(--ease-out);
+}
+
+/* placeholder rows carry the row geometry but no affordance */
+.nav-row.is-sk {
+  pointer-events: none;
+}
+
+.nav-row.is-sk .sk {
+  opacity: 0.55;
+}
+
+.nav-row.is-empty-state {
+  color: var(--text-4);
+  font-size: var(--fs-sm);
+  height: 24px;
+}
+
+.nav-row.is-destructive:hover {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.sidebar-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 10px;
+  border-top: 0.5px solid var(--separator);
+}
+
+.sidebar-foot .spacer {
+  flex: 1;
+}
+
+/* ------------------------------ main column ---------------------- */
+
+.main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--content);
+}
+
+.toolbar {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  height: var(--toolbar-h);
+  padding: 0 var(--gutter);
+  background: var(--chrome);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: inset 0 -0.5px 0 var(--separator);
+}
+
+.toolbar-title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s2);
+  min-width: 0;
+  flex: 1;
+}
+
+.toolbar-name {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  flex: none;
+}
+
+.count-badge {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--tint);
+  letter-spacing: 0;
+}
+
+/* search — expands on focus, one surface, no icon soup */
+
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 168px;
+  height: 28px;
+  padding: 0 7px;
+  border-radius: var(--r-field);
+  background: var(--surface-sunken);
+  box-shadow: inset 0 0 0 0.5px var(--edge), inset 0 0.5px 1px rgba(16, 16, 22, 0.04);
+  transition: width var(--t-base) var(--ease-out), box-shadow var(--t-micro) var(--ease-out),
+    background-color var(--t-micro) var(--ease-out);
+}
+
+.search:focus-within {
+  width: 264px;
+  background: var(--surface);
+  box-shadow: 0 0 0 3px var(--accent-ring), inset 0 0 0 0.5px transparent;
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-base);
+  background: transparent;
+}
+
+.search-icon {
+  color: var(--text-4);
+  transition: color var(--t-tint) var(--ease-out);
+}
+
+.search:focus-within .search-icon {
+  color: var(--text-2);
+}
+
+.search kbd {
+  pointer-events: none;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-4);
+  font-size: 10px;
+}
+
+.search:focus-within kbd {
+  opacity: 0;
+  transition: opacity var(--t-tint) linear;
+}
+
+.search-clear {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--r-pill);
+  background: var(--tint-strong);
+  color: var(--text-2);
+  transition: background-color var(--t-tint) var(--ease-out), transform var(--t-micro) var(--ease-out);
+}
+
+.search-clear:hover {
+  background: var(--text-4);
+  color: var(--surface);
+}
+
+.search-clear:active {
+  transform: scale(0.9);
+}
+
+/* ------------------------------ scroller -------------------------- */
+
+.scroller {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  padding: 0 var(--gutter) 96px;
+  scroll-behavior: smooth;
+}
+
+.content {
+  width: 100%;
+  max-width: var(--measure);
+  margin: 0 auto;
+}
+
+.content-top {
+  height: var(--s5);
+}
+
+/* ------------------------------ mobile ---------------------------- */
+
+.sidebar-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  background: var(--scrim);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-base) var(--ease-out);
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+}
+
+@media (max-width: 1080px) {
+  .search {
+    width: 140px;
+  }
+  .search:focus-within {
+    width: 190px;
+  }
+}
+
+@media (max-width: 900px) {
+  :root {
+    --gutter: 18px;
+    --toolbar-h: 50px;
+  }
+
+  .app,
+  .app[data-sidebar="collapsed"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar {
+    position: fixed;
+    z-index: 5;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: var(--sidebar-w);
+    border-right: 0.5px solid var(--separator);
+    transform: translate3d(-100%, 0, 0);
+    /* visibility flips after the slide-out so the closed sheet cannot be
+       reached with Tab or by a screen reader. */
+    visibility: hidden;
+    transition: transform var(--t-slow) var(--ease-out),
+      visibility 0s linear var(--t-slow);
+    box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.3);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .app[data-mobile-nav="open"] .sidebar {
+    transform: translate3d(0, 0, 0);
+    visibility: visible;
+    transition: transform var(--t-slow) var(--ease-out), visibility 0s;
+  }
+
+  .app[data-mobile-nav="open"] .sidebar-scrim {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .toolbar {
+    padding-left: calc(var(--gutter) + env(safe-area-inset-left));
+    padding-right: calc(var(--gutter) + env(safe-area-inset-right));
+  }
+}
+
+@media (max-width: 680px) {
+  :root {
+    --gutter: 14px;
+    --toolbar-h: 48px;
+  }
+
+  .search {
+    display: none;
+  }
+
+  .toolbar-actions {
+    gap: 6px;
+  }
+
+  .t-title {
+    font-size: var(--fs-lg);
+  }
+}
+
+@media (max-width: 460px) {
+  .scroller {
+    padding-bottom: 120px;
+  }
+
+  .btn-new-label {
+    display: none;
+  }
+}
+
+/* Touch: no hover paints, and every tap target is comfortable. */
+
+@media (pointer: coarse) {
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .nav-row {
+    height: 34px;
+  }
+
+  .search,
+  .search:focus-within {
+    display: none;
+  }
+}
+
+/* Hover reveals the row menu in place of the count — one element per row,
+   never both, so nothing jumps when the pointer arrives. */
+
+.nav-row {
+  position: relative;
+}
+
+.nav-more {
+  position: absolute;
+  right: 5px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  color: var(--text-3);
+  opacity: 0;
+  transition: opacity var(--t-micro) var(--ease-out), background-color var(--t-tint) var(--ease-out),
+    color var(--t-tint) var(--ease-out);
+}
+
+.nav-row:hover .nav-more,
+.nav-row:focus-visible .nav-more {
+  opacity: 1;
+}
+
+.nav-row:hover .nav-count,
+.nav-row:focus-visible .nav-count {
+  opacity: 0;
+}
+
+.nav-more:hover {
+  background: var(--tint-strong);
+  color: var(--text);
+}
+
+.nav-row[aria-current="page"] .nav-more {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.nav-row[aria-current="page"] .nav-more:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+/* Toolbar state affordances: a visible marker that a non-default sort is
+   engaged, and a single search entry point on small screens. */
+
+.icon-btn[data-state="active"] {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.search-fallback {
+  display: none;
+}
+
+@media (max-width: 680px) {
+  .search-fallback {
+    display: inline-flex;
+  }
+}
+
+/* Disclosing rows are controls, not links: no accent paint, just a hue shift. */
+
+.nav-row-disclose {
+  height: 26px;
+  color: var(--text-3);
+}
+
+.nav-row-disclose:hover {
+  color: var(--text);
+}

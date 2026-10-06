@@ -1,0 +1,28 @@
+{
+  "name": "sift",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sift — a keyboard-first bookmark manager for developers.",
+  "scripts": {
+    "dev": "next dev -H 0.0.0.0 -p 3000",
+    "build": "next build",
+    "check": "tsc --noEmit && node tools/design-checks.mjs",
+    "db:init": "node scripts/init-db.mjs",
+    "start": "next start -H 0.0.0.0 -p 3000",
+    "typecheck": "tsc --noEmit",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.1.0",
+    "@neondatabase/serverless": "^1.2.0",
+    "next": "^16.3.8",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.5",
+    "@types/react": "19.0.7",
+    "@types/react-dom": "19.0.3",
+    "typescript": "5.7.3"
+  }
+}

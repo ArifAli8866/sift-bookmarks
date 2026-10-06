@@ -1,0 +1,24 @@
+node_modules
+.next
+out
+*.log
+.DS_Store
+
+# Environment & Secrets
+.env
+.env*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build & caches
+.turbo
+tsconfig.tsbuildinfo
+
+# System & OS artifacts
+.pki
+.config
+.sudo_as_admin_successful
+
+

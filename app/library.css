@@ -1,0 +1,691 @@
+/* =====================================================================
+   Library — sections, cards, rows, skeletons, empty states, toasts
+   ===================================================================== */
+
+/* ------------------------------ sections ---------------------------- */
+
+.section + .section {
+  margin-top: 30px;
+}
+
+.section-head {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  height: 38px;
+  padding: 0 2px;
+  margin-bottom: 2px;
+  background: var(--content);
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  .section-head {
+    background: color-mix(in srgb, var(--content) 82%, transparent);
+    backdrop-filter: blur(12px) saturate(160%);
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
+  }
+}
+
+.section-head[data-stuck="true"]::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 0.5px;
+  background: var(--separator);
+}
+
+.section-name {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--fs-lg);
+  font-weight: 590;
+  letter-spacing: -0.021em;
+  color: var(--text);
+}
+
+.section-name .icon {
+  color: var(--text-3);
+}
+
+.section-rule {
+  flex: 1;
+  height: 0.5px;
+  background: var(--separator);
+  opacity: 0.9;
+  min-width: 24px;
+}
+
+.section {
+  animation: section-in var(--t-base) var(--ease-out) both;
+}
+
+@keyframes section-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+}
+
+/* -------------------------------- grid ----------------------------- */
+
+.grid {
+  --card-min: 268px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--card-min), 1fr));
+  gap: 10px;
+}
+
+@media (min-width: 1500px) {
+  .grid {
+    --card-min: 296px;
+    gap: 12px;
+  }
+}
+
+/* -------------------------------- card ----------------------------- */
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100px;
+  padding: 12px 13px 0;
+  border-radius: var(--r-card);
+  background: var(--surface);
+  border: 0.5px solid var(--edge);
+  box-shadow: var(--shadow-card), var(--top-highlight);
+  cursor: default;
+  transition: transform var(--t-micro) var(--ease-out),
+    box-shadow var(--t-fast) var(--ease-out), border-color var(--t-fast) var(--ease-out),
+    background-color var(--t-tint) var(--ease-out);
+}
+
+.card::before {
+  /* Drop target hint — a ring, not a glow. */
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: calc(var(--r-card) + 3px);
+  border: 1.5px solid transparent;
+  pointer-events: none;
+  transition: border-color var(--t-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .card:hover {
+    transform: translate3d(0, -1px, 0);
+    border-color: var(--edge-strong);
+    box-shadow: var(--shadow-raised), var(--top-highlight);
+  }
+}
+
+.card:active {
+  transform: translate3d(0, 0, 0) scale(0.997);
+  transition-duration: 60ms;
+}
+
+.card:focus-visible,
+.card[data-focused="true"] {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 2px;
+}
+
+.card[data-focused="true"] {
+  border-color: var(--edge-strong);
+  box-shadow: var(--shadow-raised), var(--top-highlight);
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  min-width: 0;
+  }
+
+.card-title {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-base);
+  font-weight: 500;
+  letter-spacing: -0.012em;
+  line-height: 1.35;
+  color: var(--text);
+}
+
+.card-url {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  margin-top: 5px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.card-url-host {
+  color: var(--text-2);
+  flex: none;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-url-path {
+  color: var(--text-4);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: auto -13px 0;
+  padding: 6px 11px 6px 13px;
+  border-top: 0.5px solid var(--separator-soft);
+  min-height: 34px;
+}
+
+.card-foot .spacer {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-age {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-4);
+  letter-spacing: 0;
+  flex: none;
+}
+
+/* favicon tile: solid, quiet, never a coloured circle of doom */
+
+.tile {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: var(--r-tile);
+  background: var(--surface-sunken);
+  box-shadow: inset 0 0 0 0.5px var(--edge);
+  overflow: hidden;
+}
+
+.tile img {
+  width: 22px;
+  height: 22px;
+  opacity: 0;
+  transition: opacity var(--t-base) var(--ease-out);
+}
+
+.tile img.is-loaded {
+  opacity: 1;
+}
+
+.tile span {
+  position: absolute;
+  font-size: 9.5px;
+  font-weight: 620;
+  letter-spacing: 0.02em;
+  color: var(--text-3);
+}
+
+.tile.is-ready span {
+  opacity: 0;
+}
+
+/* row actions */
+
+.card-actions {
+  /* Above the stretched link, or the whole card swallows the tap. */
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  flex: none;
+  /* Sits in the footer rail: the title keeps the full width, and the star
+     never overlaps text. */
+  margin: -3px -4px -3px 0;
+}
+
+.card-actions .icon-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  background: transparent;
+}
+
+.card .fav-btn,
+.card .more-btn {
+  opacity: 0;
+  transition: opacity var(--t-micro) var(--ease-out),
+    background-color var(--t-tint) var(--ease-out), color var(--t-tint) var(--ease-out);
+}
+
+.card:hover .fav-btn,
+.card:hover .more-btn,
+.card:focus-within .fav-btn,
+.card:focus-within .more-btn,
+.card[data-focused="true"] .fav-btn,
+.card[data-focused="true"] .more-btn {
+  opacity: 1;
+}
+
+/* Pinned cards stay marked at rest, so the state is readable without
+   hovering. The ring on toggle lives in globals.css. */
+.card .fav-btn[aria-pressed="true"] {
+  opacity: 1;
+}
+
+/* Touch has no hover, so the star and the menu have to be reachable at rest. */
+@media (hover: none), (pointer: coarse) {
+  .card .fav-btn,
+  .card .more-btn,
+  .row .fav-btn,
+  .row .more-btn {
+    opacity: 0.72;
+  }
+  .card .fav-btn:hover,
+  .card .more-btn:hover,
+  .row .fav-btn:hover,
+  .row .more-btn:hover {
+    opacity: 1;
+  }
+}
+
+/* The stretched link makes the whole card clickable while keeping real
+   anchor semantics (⌘click, middle click, drag-to-bookmark-bar). */
+
+.card-link {
+  position: static;
+  color: inherit;
+}
+
+.card-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+.card .chip-btn {
+  z-index: 2;
+}
+
+.card,
+.row {
+  user-select: none;
+}
+
+.card a,
+.row a {
+  -webkit-user-drag: none;
+}
+
+.chip-btn {
+  position: relative;
+  cursor: default;
+}
+
+/* -------------------------------- rows ----------------------------- */
+
+.rows {
+  border-radius: var(--r-card);
+  background: var(--surface);
+  border: 0.5px solid var(--edge);
+  box-shadow: var(--shadow-card), var(--top-highlight);
+  overflow: hidden;
+}
+
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) 112px 56px 52px;
+  align-items: center;
+  gap: var(--s3);
+  height: 42px;
+  padding: 0 12px;
+  transition: background-color var(--t-tint) var(--ease-out);
+}
+
+.row + .row {
+  box-shadow: inset 0 0.5px 0 var(--separator-soft);
+}
+
+.row:hover {
+  background: var(--tint-hover);
+}
+
+.row:active {
+  background: var(--tint-press);
+}
+
+.row[data-focused="true"] {
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1.5px var(--accent-ring);
+}
+
+.row-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  min-width: 0;
+}
+
+.row-title {
+  font-size: var(--fs-base);
+  font-weight: 480;
+  letter-spacing: -0.011em;
+  min-width: 0;
+}
+
+.row-url {
+  display: flex;
+  align-items: baseline;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row-url b {
+  color: var(--text-2);
+  font-weight: 480;
+  flex: none;
+  margin-right: 0.5px;
+}
+
+.row-col {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+  justify-content: flex-end;
+  position: relative;
+  z-index: 2;
+}
+
+.row-col-tags {
+  justify-content: flex-start;
+}
+
+.row-col-age {
+  justify-content: flex-end;
+  color: var(--text-4);
+}
+
+.row .row-actions {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  justify-content: flex-end;
+}
+
+.row .fav-btn,
+.row .more-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  opacity: 0;
+  transition: opacity var(--t-micro) var(--ease-out), background-color var(--t-tint) var(--ease-out),
+    color var(--t-tint) var(--ease-out);
+}
+
+.row:hover .fav-btn,
+.row:hover .more-btn,
+.row:focus-within .fav-btn,
+.row:focus-within .more-btn,
+.row[data-focused="true"] .fav-btn {
+  opacity: 1;
+}
+
+.row .fav-btn[aria-pressed="true"] {
+  opacity: 1;
+}
+
+.row-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.row .row-actions {
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 900px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) 24px;
+    gap: 8px;
+    height: 54px;
+    padding: 0 10px;
+  }
+
+  .row-url,
+  .row-col:not(.row-col-age) {
+    display: none;
+  }
+
+  .row-actions .more-btn {
+    display: none;
+  }
+}
+
+/* ------------------------------ drag states ----------------------- */
+
+.is-dragging .card:not(.is-drag-source),
+.is-dragging .row:not(.is-drag-source) {
+  transition: transform var(--t-base) var(--ease-out), background-color var(--t-tint) var(--ease-out);
+}
+
+.is-dragging .card:hover {
+  transform: none;
+}
+
+.card.is-drag-source {
+  z-index: 6;
+  cursor: grabbing;
+  border-color: transparent;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-drag);
+  transition: box-shadow var(--t-micro) var(--ease-out), background-color var(--t-micro) var(--ease-out);
+}
+
+.card.is-drag-source::before {
+  border-color: color-mix(in srgb, var(--accent) 34%, transparent);
+}
+
+.card.is-settling {
+  transition: transform var(--t-base) var(--ease-out), box-shadow var(--t-base) var(--ease-out),
+    border-color var(--t-base) var(--ease-out), background-color var(--t-base) var(--ease-out);
+}
+
+html.is-reordering {
+  cursor: grabbing;
+  user-select: none;
+}
+
+html.is-reordering .card {
+  cursor: grabbing;
+}
+
+/* rows get a left insertion rail instead of a lifted plate */
+.row.is-drag-source {
+  z-index: 6;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-raised);
+}
+
+/* ----------------------------- skeletons -------------------------- */
+
+.sk-card {
+  min-height: 100px;
+  padding: 12px 13px 0;
+  border-radius: var(--r-card);
+  background: var(--surface);
+  border: 0.5px solid var(--separator-soft);
+  box-shadow: var(--top-highlight);
+}
+
+.sk-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.sk-foot {
+  margin: auto -13px 0;
+  padding: 7px 13px;
+  border-top: 0.5px solid var(--separator-soft);
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------------------------- empty state ------------------------- */
+
+.empty {
+  display: grid;
+  justify-items: center;
+  padding: 84px var(--s5) 40px;
+  text-align: center;
+  animation: empty-in var(--t-slow) var(--ease-out) both;
+}
+
+@keyframes empty-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+}
+
+.empty-glyph {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  background: var(--surface);
+  color: var(--text-4);
+  box-shadow: inset 0 0 0 0.5px var(--edge), var(--shadow-card);
+}
+
+.empty-title {
+  margin-top: 15px;
+  font-size: var(--fs-lg);
+  font-weight: 590;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.empty-body {
+  margin-top: 6px;
+  max-width: 40ch;
+  font-size: var(--fs-base);
+  color: var(--text-3);
+  line-height: 1.5;
+}
+
+.empty-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  margin-top: 18px;
+}
+
+@media (max-width: 680px) {
+  .empty {
+    padding-top: 56px;
+  }
+}
+
+/* ------------------------------- toasts --------------------------- */
+
+.toast-wrap {
+  position: fixed;
+  z-index: 70;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s2);
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  padding: 0 5px 0 12px;
+  border-radius: 9px;
+  background: var(--surface-raised);
+  border: 0.5px solid var(--edge-strong);
+  box-shadow: var(--shadow-pop), var(--top-highlight);
+  font-size: var(--fs-sm);
+  color: var(--text);
+  animation: toast-in var(--t-base) var(--ease-out) both;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0) scale(0.98);
+  }
+}
+
+.toast.is-out {
+  animation: toast-out var(--t-fast) var(--ease-in) both;
+}
+
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0) scale(0.985);
+  }
+}
+
+.toast-icon {
+  color: var(--text-3);
+}
+
+@media (max-width: 680px) {
+  .toast-wrap {
+    left: var(--gutter);
+    right: var(--gutter);
+    bottom: 18px;
+    transform: none;
+    align-items: stretch;
+  }
+
+  .toast {
+    justify-content: space-between;
+  }
+}

@@ -1,0 +1,883 @@
+/* =====================================================================
+   Sift — design system
+   ---------------------------------------------------------------------
+   Everything visual derives from these tokens. Nothing in the component
+   styles below hard-codes a colour, a radius or a duration; if a value
+   cannot be expressed with a token, the token set is wrong.
+   ===================================================================== */
+
+/* ---------------------------- palette ------------------------------ */
+
+:root {
+  color-scheme: light;
+
+  --window: #ffffff;
+  --content: #f6f6f8;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-sunken: #f1f1f4;
+  --sidebar: rgba(245, 245, 248, 0.78);
+  --chrome: rgba(250, 250, 252, 0.82);
+
+  --text: #1b1b1f;
+  --text-2: #63636c;
+  --text-3: #91919b;
+  --text-4: #b6b6bf;
+
+  --separator: rgba(17, 17, 22, 0.085);
+  --separator-soft: rgba(17, 17, 22, 0.055);
+  --edge: rgba(17, 17, 22, 0.075);
+  --edge-strong: rgba(17, 17, 22, 0.13);
+
+  --tint: rgba(17, 17, 22, 0.042);
+  --tint-hover: rgba(17, 17, 22, 0.05);
+  --tint-press: rgba(17, 17, 22, 0.085);
+  --tint-strong: rgba(17, 17, 22, 0.07);
+
+  --accent: #0a7aff;
+  --accent-hover: #0070ea;
+  --accent-press: #005ec4;
+  --accent-on: #ffffff;
+  --accent-ring: rgba(10, 122, 255, 0.26);
+  --accent-soft: rgba(10, 122, 255, 0.09);
+
+  --fav: #b3801f;
+  --fav-soft: rgba(179, 128, 31, 0.11);
+  --danger: #cf3f37;
+  --danger-fill: #e0483f;
+  --danger-soft: rgba(207, 63, 55, 0.09);
+  --success: #2da44e;
+  --success-soft: rgba(45, 164, 78, 0.12);
+  --warning: #d97706;
+
+  --highlight: rgba(17, 17, 22, 0.055);
+  --top-highlight: inset 0 0.5px 0 rgba(255, 255, 255, 0.85);
+
+  --shadow-card: 0 0.5px 1px rgba(16, 16, 22, 0.04), 0 1px 3px rgba(16, 16, 22, 0.035);
+  --shadow-raised: 0 1px 2px rgba(16, 16, 22, 0.05), 0 6px 16px -8px rgba(16, 16, 22, 0.1);
+  --shadow-pop: 0 1px 3px rgba(14, 14, 20, 0.07), 0 12px 30px -10px rgba(14, 14, 20, 0.2);
+  --shadow-modal: 0 2px 6px rgba(10, 10, 16, 0.09), 0 32px 72px -22px rgba(10, 10, 16, 0.34);
+  --shadow-drag: 0 2px 4px rgba(14, 14, 20, 0.06), 0 14px 28px -10px rgba(14, 14, 20, 0.2);
+
+  --scrim: rgba(24, 24, 30, 0.28);
+
+  /* ---------------------------- geometry --------------------------- */
+  --r-field: 7px;
+  --r-btn: 7px;
+  --r-row: 6px;
+  --r-card: 10px;
+  --r-menu: 9px;
+  --r-panel: 12px;
+  --r-modal: 13px;
+  --r-tile: 5px;
+  --r-pill: 999px;
+
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 20px;
+  --s6: 24px;
+  --s8: 32px;
+  --s10: 40px;
+  --s14: 56px;
+
+  --sidebar-w: 236px;
+  --toolbar-h: 52px;
+  --gutter: 28px;
+  --measure: 1220px;
+
+  --fs-micro: 11px;
+  --fs-meta: 11.5px;
+  --fs-sm: 12px;
+  --fs-base: 13px;
+  --fs-lg: 14px;
+  --fs-title: 15px;
+
+  /* ------------------------------ type ----------------------------- */
+  --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro",
+    "Segoe UI Variable Text", "Inter var", Inter, system-ui, "Helvetica Neue",
+    sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "SFMono-Regular", "JetBrains Mono",
+    Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* ----------------------------- motion ---------------------------- */
+  /* Fast, decelerating, slightly expo. Overshoot is reserved for the
+     favourite tick — anywhere else it reads as bounce, not as weight. */
+  --ease-out: cubic-bezier(0.22, 0.8, 0.28, 1);
+  --ease-in-out: cubic-bezier(0.4, 0.02, 0.2, 1);
+  --ease-in: cubic-bezier(0.5, 0, 0.75, 0.35);
+  --ease-tick: cubic-bezier(0.3, 1.55, 0.5, 1);
+  --t-tint: 110ms;
+  --t-micro: 130ms;
+  --t-fast: 170ms;
+  --t-base: 210ms;
+  --t-slow: 260ms;
+  --t-settle: 320ms;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --window: #0e0e10;
+  --content: #161618;
+  --surface: #1e1e21;
+  --surface-raised: #232327;
+  --surface-sunken: #131316;
+  --sidebar: rgba(24, 24, 27, 0.72);
+  --chrome: rgba(26, 26, 29, 0.78);
+
+  --text: #f1f1f4;
+  --text-2: #a1a1ab;
+  --text-3: #7b7b85;
+  --text-4: #5c5c66;
+
+  --separator: rgba(255, 255, 255, 0.085);
+  --separator-soft: rgba(255, 255, 255, 0.05);
+  --edge: rgba(255, 255, 255, 0.075);
+  --edge-strong: rgba(255, 255, 255, 0.14);
+
+  --tint: rgba(255, 255, 255, 0.055);
+  --tint-hover: rgba(255, 255, 255, 0.07);
+  --tint-press: rgba(255, 255, 255, 0.1);
+  --tint-strong: rgba(255, 255, 255, 0.09);
+
+  --accent: #0a84ff;
+  --accent-hover: #2f97ff;
+  --accent-press: #0069d9;
+  --accent-ring: rgba(10, 132, 255, 0.42);
+  --accent-soft: rgba(10, 132, 255, 0.16);
+
+  --fav: #dda84e;
+  --fav-soft: rgba(221, 168, 78, 0.14);
+  --danger: #ff6b63;
+  --danger-fill: #d8504a;
+  --danger-soft: rgba(255, 107, 99, 0.12);
+  --success: #3fb950;
+  --success-soft: rgba(63, 185, 80, 0.16);
+  --warning: #f59e0b;
+
+  --highlight: rgba(255, 255, 255, 0.085);
+  --top-highlight: inset 0 0.5px 0 rgba(255, 255, 255, 0.055);
+
+  --shadow-card: 0 0.5px 1px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.22);
+  --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 16px -8px rgba(0, 0, 0, 0.5);
+  --shadow-pop: 0 1px 3px rgba(0, 0, 0, 0.45), 0 14px 34px -12px rgba(0, 0, 0, 0.7);
+  --shadow-modal: 0 2px 8px rgba(0, 0, 0, 0.5), 0 34px 80px -22px rgba(0, 0, 0, 0.8);
+  --shadow-drag: 0 2px 5px rgba(0, 0, 0, 0.4), 0 16px 32px -10px rgba(0, 0, 0, 0.72);
+
+  --scrim: rgba(0, 0, 0, 0.45);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --window: #0e0e10;
+    --content: #161618;
+    --surface: #1e1e21;
+    --surface-raised: #232327;
+    --surface-sunken: #131316;
+    --sidebar: rgba(24, 24, 27, 0.72);
+    --chrome: rgba(26, 26, 29, 0.78);
+    --text: #f1f1f4;
+    --text-2: #a1a1ab;
+    --text-3: #7b7b85;
+    --text-4: #5c5c66;
+    --separator: rgba(255, 255, 255, 0.085);
+    --separator-soft: rgba(255, 255, 255, 0.05);
+    --edge: rgba(255, 255, 255, 0.075);
+    --edge-strong: rgba(255, 255, 255, 0.14);
+    --tint: rgba(255, 255, 255, 0.055);
+    --tint-hover: rgba(255, 255, 255, 0.07);
+    --tint-press: rgba(255, 255, 255, 0.1);
+    --tint-strong: rgba(255, 255, 255, 0.09);
+    --accent: #0a84ff;
+    --accent-hover: #2f97ff;
+    --accent-press: #0069d9;
+    --accent-ring: rgba(10, 132, 255, 0.42);
+    --accent-soft: rgba(10, 132, 255, 0.16);
+    --fav: #dda84e;
+    --fav-soft: rgba(221, 168, 78, 0.14);
+    --danger: #ff6b63;
+    --danger-fill: #d8504a;
+    --danger-soft: rgba(255, 107, 99, 0.12);
+    --success: #3fb950;
+    --success-soft: rgba(63, 185, 80, 0.16);
+    --warning: #f59e0b;
+    --highlight: rgba(255, 255, 255, 0.085);
+    --top-highlight: inset 0 0.5px 0 rgba(255, 255, 255, 0.055);
+    --shadow-card: 0 0.5px 1px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.22);
+    --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 16px -8px rgba(0, 0, 0, 0.5);
+    --shadow-pop: 0 1px 3px rgba(0, 0, 0, 0.45), 0 14px 34px -12px rgba(0, 0, 0, 0.7);
+    --shadow-modal: 0 2px 8px rgba(0, 0, 0, 0.5), 0 34px 80px -22px rgba(0, 0, 0, 0.8);
+    --shadow-drag: 0 2px 5px rgba(0, 0, 0, 0.4), 0 16px 32px -10px rgba(0, 0, 0, 0.72);
+    --scrim: rgba(0, 0, 0, 0.45);
+  }
+}
+
+/* ------------------------------ reset ------------------------------ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--window);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: var(--fs-base);
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  font-feature-settings: "cv01" 1, "ss03" 1, "case" 1;
+  overflow: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure {
+  margin: 0;
+  font-weight: inherit;
+  font-size: inherit;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: default;
+  -webkit-appearance: none;
+  appearance: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-4);
+  opacity: 1;
+}
+
+svg {
+  display: block;
+  flex: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+/* --------------------------- typography ---------------------------- */
+
+.t-num {
+  font-variant-numeric: tabular-nums;
+}
+
+.t-mono {
+  font-family: var(--font-mono);
+  letter-spacing: -0.01em;
+}
+
+.t-title {
+  font-size: var(--fs-title);
+  font-weight: 590;
+  letter-spacing: -0.022em;
+  line-height: 1.2;
+}
+
+.t-section {
+  font-size: var(--fs-micro);
+  font-weight: 590;
+  letter-spacing: 0.045em;
+  color: var(--text-3);
+  text-transform: none;
+}
+
+.t-meta {
+  font-size: var(--fs-meta);
+  color: var(--text-3);
+  letter-spacing: 0;
+}
+
+.truncate {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------------------------- focus ring --------------------------- */
+/* Keyboard only. Nothing in this app shows a ring on mouse click. */
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+
+.field:focus-within,
+.btn:focus-visible,
+.palette-field:focus {
+  outline: none;
+}
+
+/* ------------------------- materials / vibrancy -------------------- */
+
+.material {
+  background: var(--sidebar);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+
+@supports not (backdrop-filter: blur(2px)) {
+  .material {
+    background: var(--content);
+  }
+  .popover {
+    background: var(--surface-raised);
+  }
+}
+
+/* ------------------------------ buttons ---------------------------- */
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 11px;
+  border-radius: var(--r-btn);
+  border: 0.5px solid var(--edge-strong);
+  background: var(--surface-raised);
+  color: var(--text);
+  font-size: var(--fs-base);
+  font-weight: 500;
+  letter-spacing: -0.012em;
+  box-shadow: 0 0.5px 1px rgba(16, 16, 22, 0.07), var(--top-highlight);
+  transition: background-color var(--t-tint) var(--ease-out),
+    box-shadow var(--t-micro) var(--ease-out), transform var(--t-micro) var(--ease-out),
+    opacity var(--t-tint) linear;
+  white-space: nowrap;
+  user-select: none;
+}
+
+:root[data-theme="dark"] .btn {
+  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.4), var(--top-highlight);
+}
+
+.btn:hover {
+  background: var(--surface-raised);
+  filter: brightness(0.985);
+  box-shadow: 0 1px 2px rgba(16, 16, 22, 0.09), var(--top-highlight);
+}
+
+:root[data-theme="dark"] .btn:hover {
+  filter: brightness(1.1);
+}
+
+.btn:active {
+  transform: translateY(0.5px) scale(0.994);
+  filter: brightness(0.965);
+  box-shadow: inset 0 1px 1.5px rgba(16, 16, 22, 0.09), var(--top-highlight);
+  transition-duration: 60ms;
+}
+
+:root[data-theme="dark"] .btn:active {
+  filter: brightness(0.88);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.btn:focus-visible {
+  box-shadow: 0 0 0 3px var(--accent-ring), var(--top-highlight);
+}
+
+.btn[disabled],
+.btn[aria-disabled="true"] {
+  opacity: 0.42;
+  pointer-events: none;
+  box-shadow: none;
+}
+
+.btn-primary {
+  border-color: transparent;
+  background: var(--accent);
+  color: var(--accent-on);
+  font-weight: 500;
+  box-shadow: 0 0.5px 1.5px rgba(10, 100, 220, 0.28), inset 0 0.5px 0 rgba(255, 255, 255, 0.28);
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  filter: none;
+  box-shadow: 0 1px 3px rgba(10, 100, 220, 0.34), inset 0 0.5px 0 rgba(255, 255, 255, 0.28);
+}
+
+.btn-primary:active {
+  background: var(--accent-press);
+  filter: none;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.22);
+}
+
+.btn-quiet {
+  border-color: transparent;
+  background: transparent;
+  color: var(--text-2);
+  box-shadow: none;
+}
+
+.btn-quiet:hover {
+  background: var(--tint-hover);
+  color: var(--text);
+  filter: none;
+  box-shadow: none;
+}
+
+.btn-quiet:active {
+  background: var(--tint-press);
+  box-shadow: none;
+  transform: translateY(0.5px);
+}
+
+.btn-danger {
+  border-color: transparent;
+  background: var(--danger-fill);
+  color: #fff;
+  box-shadow: 0 0.5px 1.5px rgba(180, 40, 34, 0.3), inset 0 0.5px 0 rgba(255, 255, 255, 0.24);
+}
+
+.btn-danger:hover {
+  filter: brightness(1.04);
+  background: var(--danger-fill);
+}
+
+.btn-danger:active {
+  filter: brightness(0.94);
+}
+
+.btn-sm {
+  height: 24px;
+  padding: 0 8px;
+  font-size: var(--fs-sm);
+  border-radius: 6px;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-row);
+  color: var(--text-3);
+  background: transparent;
+  border: 0.5px solid transparent;
+  transition: background-color var(--t-tint) var(--ease-out),
+    color var(--t-tint) var(--ease-out), transform var(--t-micro) var(--ease-out),
+    opacity var(--t-tint) linear, border-color var(--t-tint) var(--ease-out);
+}
+
+.icon-btn:hover {
+  background: var(--tint-hover);
+  color: var(--text);
+}
+
+.icon-btn:active {
+  background: var(--tint-press);
+  transform: scale(0.93);
+  transition-duration: 60ms;
+}
+
+.icon-btn[aria-disabled="true"] {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* ------------------------ segmented control ------------------------ */
+
+.segmented {
+  position: relative;
+  display: inline-flex;
+  padding: 2px;
+  gap: 2px;
+  border-radius: 8px;
+  background: var(--surface-sunken);
+  box-shadow: inset 0 0 0 0.5px var(--edge), inset 0 0.5px 1px rgba(16, 16, 22, 0.05);
+}
+
+.segmented-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  height: calc(100% - 4px);
+  border-radius: 6px;
+  background: var(--surface-raised);
+  box-shadow: 0 0.5px 1.5px rgba(16, 16, 22, 0.14), var(--top-highlight);
+  transition: transform var(--t-fast) var(--ease-out), width var(--t-fast) var(--ease-out);
+  will-change: transform;
+}
+
+.segmented-btn {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  min-width: 26px;
+  padding: 0 6px;
+  border-radius: 6px;
+  color: var(--text-3);
+  transition: color var(--t-tint) var(--ease-out);
+}
+
+.segmented-btn:hover {
+  color: var(--text-2);
+}
+
+.segmented-btn[aria-pressed="true"] {
+  color: var(--text);
+}
+
+/* ------------------------------ fields ---------------------------- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.field-label {
+  font-size: var(--fs-micro);
+  font-weight: 520;
+  letter-spacing: 0.02em;
+  color: var(--text-2);
+}
+
+.input {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 30px;
+  padding: 0 9px;
+  border-radius: var(--r-field);
+  background: var(--surface);
+  border: 0.5px solid var(--edge-strong);
+  box-shadow: inset 0 0.5px 1px rgba(16, 16, 22, 0.04);
+  font-size: var(--fs-base);
+  color: var(--text);
+  transition: box-shadow var(--t-micro) var(--ease-out), border-color var(--t-micro) var(--ease-out),
+    background-color var(--t-micro) var(--ease-out);
+}
+
+.input:focus-within {
+  border-color: transparent;
+  box-shadow: 0 0 0 3px var(--accent-ring), inset 0 0.5px 1px rgba(16, 16, 22, 0.03);
+  background: var(--surface);
+}
+
+/* Fields own their focus ring (a 3px glow on the wrapper). A second outline
+   on the raw input would read as a double border. */
+.input input:focus-visible,
+.input textarea:focus-visible,
+.tags-field input:focus-visible,
+.search input:focus-visible,
+.palette-input:focus-visible {
+  outline: none;
+}
+
+.input input,
+.input textarea {
+  width: 100%;
+  min-width: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: var(--fs-base);
+}
+
+.input input::selection {
+  background: var(--accent-soft);
+}
+
+.input-invalid {
+  border-color: color-mix(in srgb, var(--danger) 55%, transparent);
+  box-shadow: 0 0 0 3px var(--danger-soft);
+}
+
+/* --------------------------- chips / keys ------------------------- */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: var(--r-tile);
+  background: var(--tint);
+  color: var(--text-2);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  transition: background-color var(--t-tint) var(--ease-out), color var(--t-tint) var(--ease-out);
+}
+
+.chip:hover {
+  background: var(--tint-strong);
+  color: var(--text);
+}
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 4px;
+  background: var(--surface-raised);
+  box-shadow: inset 0 0 0 0.5px var(--edge-strong), 0 0.5px 1px rgba(16, 16, 22, 0.08);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--text-2);
+  line-height: 1;
+}
+
+:root[data-theme="dark"] kbd {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* --------------------------- fav / danger ------------------------- */
+
+.fav-btn {
+  position: relative;
+  color: var(--text-4);
+}
+
+.fav-btn:hover {
+  color: var(--fav);
+  background: var(--fav-soft);
+}
+
+.fav-btn[aria-pressed="true"] {
+  color: var(--fav);
+}
+
+/* One-shot ring, then it is gone. A permanent wash behind a static star
+   would make every pinned card louder than the title it belongs to. */
+.fav-btn.is-ticked::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 6px;
+  background: var(--fav-soft);
+  pointer-events: none;
+  animation: tick-ring var(--t-slow) var(--ease-out) both;
+}
+
+.fav-btn.is-ticked svg {
+  animation: tick 240ms var(--ease-out);
+}
+
+@keyframes tick {
+  0% {
+    transform: scale(1);
+  }
+  42% {
+    transform: scale(1.17);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes tick-ring {
+  0% {
+    opacity: 0;
+    transform: scale(0.62);
+  }
+  38% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.28);
+  }
+}
+
+/* ----------------------------- scrollbars ------------------------- */
+
+.scroll {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.scroll:hover,
+.scroll:focus-within {
+  scrollbar-color: var(--tint-strong) transparent;
+}
+
+.scroll::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+.scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: var(--r-pill);
+  background: transparent;
+  background-clip: content-box;
+}
+
+.scroll:hover::-webkit-scrollbar-thumb,
+.scroll:focus-within::-webkit-scrollbar-thumb {
+  background: rgba(140, 140, 150, 0.42);
+  background-clip: content-box;
+}
+
+.scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 120, 132, 0.62);
+  background-clip: content-box;
+}
+
+:root[data-theme="dark"] .scroll:hover::-webkit-scrollbar-thumb {
+  background: rgba(220, 220, 230, 0.28);
+  background-clip: content-box;
+}
+
+/* ------------------------------ skeleton -------------------------- */
+
+.sk {
+  position: relative;
+  overflow: hidden;
+  background: var(--tint);
+  border-radius: 4px;
+}
+
+.sk::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--surface) 55%, transparent) 45%,
+    transparent 90%
+  );
+  transform: translateX(-100%);
+  animation: shimmer 1.5s var(--ease-in-out) infinite;
+}
+
+@keyframes shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* --------------------------- spinner (16px) ----------------------- */
+
+.spin {
+  animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ----------------------------- reduced motion --------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .card:hover {
+    transform: none !important;
+  }
+}
