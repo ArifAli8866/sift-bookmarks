@@ -1,151 +1,615 @@
-# Sift — Keyboard-First Bookmark Manager
+<div align="center">
 
-**Sift** is a keyboard-first bookmark manager designed for developers. It pairs fast client-side performance with **Neon Serverless PostgreSQL** cloud persistence and is optimized for zero-config deployment on **Vercel**.
+# ✦ SIFT
+
+### Your personal developer library.
+
+**Save. Organize. Search. Ship.**
+
+A beautiful workspace for all the websites, tools, documentation and resources you use every day.
+
+<br />
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-000000?style=for-the-badge\&logo=vercel\&logoColor=white)](https://sift-bookmarks.vercel.app/)
+[![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat-square\&logo=next.js\&logoColor=white)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square\&logo=typescript\&logoColor=white)](https://www.typescriptlang.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square\&logo=postgresql\&logoColor=white)](https://www.postgresql.org/)
+[![Neon](https://img.shields.io/badge/Neon-00E599?style=flat-square\&logo=neon\&logoColor=black)](https://neon.tech/)
+
+<br />
+
+<a href="https://sift-bookmarks.vercel.app/">
+  <img src="https://img.shields.io/badge/OPEN%20SIFT-%E2%86%92-111111?style=for-the-badge" />
+</a>
+
+</div>
+
+<br />
 
 ---
 
-## ✨ Features
+<div align="center">
 
-- ⚡ **Instant & Optimistic UI**: Immediate client-side reactions backed by automatic cloud synchronization.
-- 🐘 **Neon Serverless PostgreSQL**: Robust, scalable cloud storage with automatic table migration.
-- 🔍 **Command Palette (`⌘K` / `Ctrl+K`)**: Fuzzy search across titles, URLs, tags, and collections.
-- 🗂 **Collections & Tags**: Organize bookmarks into folders and multi-tag taxonomies.
-- ⭐ **Favourites & Recents**: One-tap access to frequently used developer resources.
-- 🖱 **Manual Drag & Reorder**: Customize item ordering with persistent fractional sorting.
-- 🌓 **Theme Support**: Seamless Dark, Light, and System appearance modes with zero flicker.
-- 🛡 **Graceful Local Fallback**: Continues functioning via browser `localStorage` if offline or running without a database.
+## The developer web, organized.
+
+<img src="./public/screenshots/dashboard.png" alt="Sift Dashboard" width="950"/>
+
+</div>
 
 ---
 
-## 🛠 Tech Stack
+## ✦ THE PROBLEM
 
-- **Framework**: [Next.js 16](https://nextjs.org/) (App Router & Turbopack)
-- **UI Library**: [React 19](https://react.dev/)
-- **Language**: [TypeScript 5](https://www.typescriptlang.org/)
-- **Database**: [Neon PostgreSQL](https://neon.tech/) (`@neondatabase/serverless`)
-- **Styling**: Modern CSS design system (tokens, variables, theme switches)
-- **Deployment**: [Vercel](https://vercel.com/)
+<div align="center">
+
+### Too many tabs.
+
+### Too many bookmarks.
+
+### Too many useful websites.
+
+<br />
+
+```text
+GitHub    MDN    React    Next.js    npm
+Vercel    Neon   Supabase    Prisma
+ChatGPT   Claude  Postman    Figma
+Regex101  Docker  Railway    ...
+```
+
+### Sift brings them together.
+
+</div>
 
 ---
 
-## 🚀 Getting Started Locally
+## ⚡ ONE PLACE. EVERYTHING YOU NEED.
 
-### 1. Install Dependencies
+```mermaid
+mindmap
+  root((SIFT))
+    Development
+      GitHub
+      React
+      Next.js
+      TypeScript
+      npm
+    AI
+      ChatGPT
+      Claude
+      Hugging Face
+      OpenRouter
+    Database
+      Neon
+      Supabase
+      Prisma
+      MongoDB
+    Deployment
+      Vercel
+      Railway
+      Netlify
+    Tools
+      Postman
+      Regex101
+      JSON
+      Excalidraw
+    Design
+      Figma
+      Dribbble
+      Unsplash
+```
+
+---
+
+# ✦ BUILT FOR YOUR WORKFLOW
+
+<div align="center">
+
+|        🔖       |           ⭐           |        🗂️        |       🔎       |
+| :-------------: | :-------------------: | :---------------: | :------------: |
+|  **Bookmarks**  |     **Favorites**     |   **Categories**  |   **Search**   |
+| Save everything | Keep essentials close | Organize your way | Find instantly |
+
+</div>
+
+---
+
+## 🔖 YOUR BOOKMARKS
+
+Save the websites you actually use.
+
+<div align="center">
+
+<img src="./public/screenshots/bookmarks.png" alt="Bookmarks" width="900"/>
+
+</div>
+
+```text
+┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
+│ ◉                │  │ ◉                │  │ ◉                │
+│                  │  │                  │  │                  │
+│ GitHub           │  │ React            │  │ Next.js          │
+│ Code hosting     │  │ Documentation    │  │ Documentation    │
+│                  │  │                  │  │                  │
+│ Development  ☆   │  │ Development  ☆   │  │ Development  ★   │
+└──────────────────┘  └──────────────────┘  └──────────────────┘
+```
+
+---
+
+# ✦ ORGANIZE YOUR WAY
+
+Create categories that match **your** workflow.
+
+```mermaid
+flowchart LR
+    A[Your Library] --> B[Development]
+    A --> C[AI]
+    A --> D[Database]
+    A --> E[Design]
+    A --> F[Deployment]
+    A --> G[Tools]
+
+    B --> B1[GitHub]
+    B --> B2[React]
+    B --> B3[Next.js]
+
+    C --> C1[ChatGPT]
+    C --> C2[Claude]
+
+    D --> D1[Neon]
+    D --> D2[Supabase]
+
+    E --> E1[Figma]
+    E --> E2[Dribbble]
+```
+
+### Categories are yours.
+
+Create them.
+
+Rename them.
+
+Customize them.
+
+Organize your library exactly how you work.
+
+---
+
+# ✦ SEARCH WITHOUT THE HUNT
+
+<div align="center">
+
+```text
+┌───────────────────────────────────────────────────────┐
+│  ⌕   Search your library...                    ⌘ K   │
+└───────────────────────────────────────────────────────┘
+```
+
+<br />
+
+### Type → Find → Open
+
+</div>
+
+Search across:
+
+```text
+Title
+   ↓
+URL
+   ↓
+Description
+   ↓
+Category
+```
+
+---
+
+# ⌘ COMMAND PALETTE
+
+<div align="center">
+
+<img src="./public/screenshots/command-palette.png" alt="Command Palette" width="700"/>
+
+</div>
+
+```text
+                 ┌───────────────────────────────┐
+                 │ ⌕  Search anything...         │
+                 ├───────────────────────────────┤
+                 │                               │
+                 │  ◉  GitHub                    │
+                 │     github.com                │
+                 │                               │
+                 │  ◉  GitHub Docs               │
+                 │     docs.github.com           │
+                 │                               │
+                 │  ◉  GitHub API                │
+                 │     docs.github.com/api       │
+                 │                               │
+                 └───────────────────────────────┘
+```
+
+Press:
+
+**⌘ K / Ctrl K**
+
+Search your entire library without leaving the keyboard.
+
+---
+
+# ✦ YOUR DATA. YOUR LIBRARY.
+
+Sift is built around **personal workspaces**.
+
+```mermaid
+flowchart TB
+
+    USER["👤 User"]
+
+    USER --> AUTH["🔐 Authentication"]
+
+    AUTH --> WORKSPACE["✦ Personal Workspace"]
+
+    WORKSPACE --> BOOKMARKS["🔖 Bookmarks"]
+    WORKSPACE --> CATEGORIES["🗂 Categories"]
+    WORKSPACE --> FAVORITES["⭐ Favorites"]
+    WORKSPACE --> RECENT["🕐 Recent"]
+
+    BOOKMARKS --> DB[("PostgreSQL")]
+    CATEGORIES --> DB
+    FAVORITES --> DB
+    RECENT --> DB
+```
+
+Every account gets its own data.
+
+```text
+User A
+ ├── GitHub
+ ├── React
+ └── Vercel
+
+        ≠
+
+User B
+ ├── Figma
+ ├── Claude
+ └── Supabase
+```
+
+---
+
+# 🔐 PRIVATE BY DESIGN
+
+Authentication:
+
+```text
+┌─────────────────────┐
+│       SIFT          │
+│                     │
+│  Email              │
+│  ┌───────────────┐  │
+│  │               │  │
+│  └───────────────┘  │
+│                     │
+│  Password           │
+│  ┌───────────────┐  │
+│  │               │  │
+│  └───────────────┘  │
+│                     │
+│  [ Create Account ] │
+│                     │
+│  ─────── OR ─────── │
+│                     │
+│  [ Continue Google ]│
+│                     │
+└─────────────────────┘
+```
+
+Your bookmarks belong to **your account**.
+
+---
+
+# ✦ SUGGESTIONS, NOT DUMMY DATA
+
+New users don't start with a library full of fake bookmarks.
+
+Instead:
+
+```text
+              YOUR EMPTY LIBRARY
+
+       "Build your developer toolbox"
+
+              Popular suggestions
+
+       ┌────────┐ ┌────────┐ ┌────────┐
+       │ GitHub │ │  MDN   │ │ React  │
+       │  + Add │ │  + Add │ │  + Add │
+       └────────┘ └────────┘ └────────┘
+
+       ┌────────┐ ┌────────┐ ┌────────┐
+       │ Vercel │ │  Neon  │ │ npm    │
+       │  + Add │ │  + Add │ │  + Add │
+       └────────┘ └────────┘ └────────┘
+```
+
+Nothing is added automatically.
+
+**You choose your library.**
+
+---
+
+# 📊 YOUR WORKSPACE AT A GLANCE
+
+```text
+╭──────────────────╮  ╭──────────────────╮
+│                  │  │                  │
+│       42         │  │       12         │
+│                  │  │                  │
+│    Bookmarks     │  │    Favorites     │
+│                  │  │                  │
+╰──────────────────╯  ╰──────────────────╯
+
+╭──────────────────╮  ╭──────────────────╮
+│                  │  │                  │
+│        7         │  │        9         │
+│                  │  │                  │
+│    Categories    │  │     Recent      │
+│                  │  │                  │
+╰──────────────────╯  ╰──────────────────╯
+```
+
+---
+
+# 🧱 ARCHITECTURE
+
+```mermaid
+flowchart LR
+
+    UI["Next.js + React"]
+
+    UI --> AUTH["Authentication"]
+
+    UI --> ACTIONS["Server Actions"]
+
+    ACTIONS --> ORM["Drizzle ORM"]
+
+    ORM --> DB[("Neon PostgreSQL")]
+
+    UI --> MOTION["Motion"]
+
+    UI --> UIKIT["Tailwind + UI Components"]
+```
+
+---
+
+# 🛠️ STACK
+
+<div align="center">
+
+### Frontend
+
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge\&logo=next.js\&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge\&logo=react\&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge\&logo=typescript\&logoColor=white)
+
+### UI
+
+![Tailwind](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge\&logo=tailwindcss\&logoColor=white)
+![Motion](https://img.shields.io/badge/Motion-FF0055?style=for-the-badge)
+
+### Backend
+
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge\&logo=postgresql\&logoColor=white)
+![Drizzle](https://img.shields.io/badge/Drizzle-ORM-C5F74F?style=for-the-badge)
+
+### Infrastructure
+
+![Neon](https://img.shields.io/badge/Neon-00E599?style=for-the-badge)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge\&logo=vercel\&logoColor=white)
+
+</div>
+
+---
+
+# 🗃️ DATA MODEL
+
+```mermaid
+erDiagram
+
+    USER ||--o{ BOOKMARK : owns
+    USER ||--o{ CATEGORY : creates
+    USER ||--|| USER_SETTINGS : has
+    BOOKMARK }o--|| CATEGORY : belongs_to
+    BOOKMARK ||--o{ RECENTLY_USED : appears_in
+
+    USER {
+        string id
+        string email
+        string name
+        string image
+    }
+
+    CATEGORY {
+        string id
+        string user_id
+        string name
+        string icon
+        string color
+    }
+
+    BOOKMARK {
+        string id
+        string user_id
+        string category_id
+        string title
+        string url
+        string description
+        boolean is_favorite
+        datetime last_opened_at
+    }
+
+    RECENTLY_USED {
+        string id
+        string bookmark_id
+        datetime opened_at
+    }
+
+    USER_SETTINGS {
+        string id
+        string user_id
+        string theme
+        boolean sidebar_collapsed
+    }
+```
+
+---
+
+# ⚙️ QUICK START
 
 ```bash
+git clone https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
+
+cd YOUR_REPOSITORY
+
 npm install
-```
 
-### 2. Configure Environment Variables (Optional for local testing)
-
-Copy `.env.example` to `.env.local`:
-
-```bash
-cp .env.example .env.local
-```
-
-If you have a Neon PostgreSQL database, add your connection string in `.env.local`:
-
-```env
-DATABASE_URL="postgresql://user:password@ep-sample-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
-```
-
-*(Note: If `DATABASE_URL` is omitted, Sift automatically runs in local storage mode.)*
-
-### 3. Initialize Database (Optional)
-
-If you configured `DATABASE_URL`, initialize the database tables:
-
-```bash
-npm run db:init
-```
-
-### 4. Run Development Server
-
-```bash
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) in your browser.
+Open:
 
----
-
-## 📋 Complete Step-by-Step Deployment Guide
-
-Follow these three steps to deploy Sift to production:
-
-### STEP 1: Set Up Neon PostgreSQL Database
-
-1. Sign up or log in at **[https://console.neon.tech](https://console.neon.tech)**.
-2. Click **Create Project** (e.g. name it `sift-db`).
-3. Once created, in your Neon Dashboard under **Connection Details**:
-   - Select **Connection string**.
-   - Make sure **Pooled connection** is checked (recommended for serverless).
-   - Copy the connection URL. It looks like:
-     ```text
-     postgresql://<user>:<password>@<ep-name>-pooler.<region>.aws.neon.tech/<dbname>?sslmode=require
-     ```
-4. *(Optional)* You can run the queries from `schema.sql` in the **SQL Editor** tab of Neon console, or let Sift automatically create the tables on the first API request or via `npm run db:init`.
-
----
-
-### STEP 2: Push Code to GitHub
-
-1. Create a new repository on **[GitHub](https://github.com/new)** (e.g. `sift` or `sift-bookmarks`). Keep it private or public as you prefer.
-2. In your terminal, initialize and commit the repository:
-
-```bash
-git add .
-git commit -m "feat: initial commit - production ready with Neon PostgreSQL and Vercel support"
-```
-
-3. Link your local repository to your GitHub repository and push:
-
-```bash
-git remote add origin https://github.com/<YOUR_GITHUB_USERNAME>/<YOUR_REPOSITORY_NAME>.git
-git branch -M main
-git push -u origin main
+```text
+http://localhost:3000
 ```
 
 ---
 
-### STEP 3: Deploy to Vercel
+# 🔑 ENVIRONMENT
 
-1. Log in to **[Vercel](https://vercel.com)**.
-2. Click **Add New…** → **Project**.
-3. Import your newly pushed **GitHub repository**.
-4. In the configuration screen:
-   - **Framework Preset**: Next.js (automatically detected)
-   - **Root Directory**: `./` (default)
-5. Expand the **Environment Variables** section:
-   - Key: `DATABASE_URL`
-   - Value: Paste your Neon PostgreSQL connection string from **Step 1**.
-6. Click **Deploy**.
-7. Vercel will build and deploy your application in under a minute!
-8. When deployment finishes, click on the live URL. Sift is now live with full cloud database persistence!
+Create `.env.local`:
 
----
+```env
+DATABASE_URL="your-neon-database-url"
 
-## 📡 API Endpoints
+AUTH_SECRET="your-auth-secret"
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/api/status` | `GET` | Health check and Neon DB connectivity report |
-| `/api/library` | `GET` | Fetch all bookmarks, collections, and preferences |
-| `/api/library` | `POST` | Batch sync library changes to Neon DB |
-| `/api/bookmarks` | `GET`, `POST` | List all bookmarks or create a new bookmark |
-| `/api/bookmarks/[id]` | `PATCH`, `DELETE` | Update or remove a specific bookmark |
-| `/api/collections` | `GET`, `POST` | List all collections or create a new collection |
-| `/api/collections/[id]` | `PATCH`, `DELETE` | Update or remove a specific collection |
+GOOGLE_CLIENT_ID="your-google-client-id"
 
----
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
 
-## ⌨️ Useful Commands
-
-```bash
-npm run dev        # Start development server on port 3000
-npm run build      # Create optimized production build
-npm run check      # Run TypeScript checks and design token verification
-npm run db:init    # Initialize database tables and indexes in Neon
-npm run start      # Start production server
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
 ```
+
+---
+
+# 🧭 ROADMAP
+
+```text
+                    SIFT
+                      │
+        ┌─────────────┼─────────────┐
+        │             │             │
+        ▼             ▼             ▼
+      CORE          ACCOUNT       POWER
+        │             │             │
+        │             │             │
+     Bookmarks     Google Auth    Command K
+     Categories    Email Auth     Keyboard
+     Favorites     Profiles       Drag & Drop
+     Search        Security       Dark Mode
+        │             │             │
+        └─────────────┼─────────────┘
+                      │
+                      ▼
+                 BROWSER EXTENSION
+                      │
+                      ├── Save current page
+                      ├── Right-click → Sift
+                      ├── Quick add
+                      └── Sync
+```
+
+---
+
+# 🌐 FUTURE
+
+### Sift Browser Extension
+
+The long-term goal:
+
+```text
+                 ANY WEBSITE
+                      │
+                      ▼
+              ┌───────────────┐
+              │  Sift Chrome  │
+              │   Extension   │
+              └───────┬───────┘
+                      │
+                      ▼
+              Select Category
+                      │
+                      ▼
+                    SAVE
+                      │
+                      ▼
+             ✦ YOUR SIFT LIBRARY
+```
+
+One click.
+
+Saved.
+
+Organized.
+
+Done.
+
+---
+
+# 📈 PROJECT VISION
+
+```text
+Bookmarks
+     ↓
+Personal Library
+     ↓
+Developer Workspace
+     ↓
+Browser Extension
+     ↓
+Your developer command center
+```
+
+Sift isn't trying to replace your browser.
+
+It makes the **web you use every day easier to access.**
+
+---
+
+<div align="center">
+
+# ✦ SIFT
+
+### Your personal developer library.
+
+**Less searching.
+Less remembering.
+More building.**
+
+<br />
+
+<a href="https://sift-bookmarks.vercel.app/">
+
+<img src="https://img.shields.io/badge/TRY%20SIFT%20%E2%86%92-111111?style=for-the-badge" />
+
+</a>
+
+<br /><br />
+
+⭐ **If Sift is useful to you, consider giving the project a star.**
+
+</div>
