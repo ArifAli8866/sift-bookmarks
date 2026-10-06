@@ -6,7 +6,10 @@ import { Toolbar } from "./Toolbar";
 import { Library } from "./Library";
 import { CommandPalette } from "./CommandPalette";
 import { BookmarkDialog } from "./BookmarkDialog";
-import { CollectionDialog } from "./CollectionDialog";
+import { CategoryDialog, type CategoryFormData } from "./CategoryDialog";
+import { SettingsDialog } from "./SettingsDialog";
+import { AuthView } from "./AuthView";
+import { OnboardingModal } from "./OnboardingModal";
 import { ConfirmDialog, ShortcutsDialog } from "./Dialog";
 import { Toasts } from "./Toasts";
 import type { ItemActions } from "./itemActions";
@@ -15,16 +18,16 @@ import { pushToast } from "../lib/toast";
 import { domainOf } from "../lib/format";
 import {
   addBookmark,
-  addCollection,
-  assignToCollection,
-  collectionById,
+  addCategory,
+  assignToCategory,
+  categoryById,
   deleteBookmarks,
-  deleteCollection,
+  deleteCategory,
   getState,
+  logoutUser,
   moveWithinVisible,
-  resetLibrary,
   restoreBookmarks,
-  updateCollection,
+  updateCategory,
   setPrefs,
   setQuery,
   setScope,
@@ -34,7 +37,7 @@ import {
   visibleBookmarks,
   countFor,
   type Bookmark,
-  type Collection,
+  type Category,
   type Scope,
 } from "../lib/store";
 
@@ -46,8 +49,9 @@ export function App() {
 
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [form, setForm] = useState<{ mode: "new" | "edit"; id?: string } | null>(null);
-  const [newDefaultCollectionId, setNewDefaultCollectionId] = useState<string | null>(null);
-  const [collectionForm, setCollectionForm] = useState<{ id?: string } | null>(null);
+  const [newDefaultCategoryId, setNewDefaultCategoryId] = useState<string | null>(null);
+  const [categoryForm, setCategoryForm] = useState<{ mode: "new" | "edit"; id?: string } | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [shortcuts, setShortcuts] = useState(false);
   const [confirmState, setConfirmState] = useState<{
     title: string;
@@ -78,15 +82,24 @@ export function App() {
   }, [lib.prefs.theme]);
 
   /* -------------------------- shared callbacks ----------------------- */
-  const scopeCollectionId = lib.scope.kind === "collection" ? (lib.scope.id ?? null) : null;
+  const scopeCategoryId =
+    lib.scope.kind === "category" || lib.scope.kind === "collection"
+      ? (lib.scope.id ?? null)
+      : null;
 
-  const openNew = useCallback((collectionId: string | null) => {
-    setNewDefaultCollectionId(collectionId);
+  const openNew = useCallback((categoryId: string | null) => {
+    setNewDefaultCategoryId(categoryId);
     setForm({ mode: "new" });
   }, []);
 
   /* --------------------------- global shortcuts ---------------------- */
-  const overlayOpen = paletteOpen || !!form || !!collectionForm || shortcuts || !!confirmState;
+  const overlayOpen =
+    paletteOpen ||
+    !!form ||
+    !!categoryForm ||
+    settingsOpen ||
+    shortcuts ||
+    !!confirmState;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -107,7 +120,7 @@ export function App() {
 
       if (meta && key === "n") {
         e.preventDefault();
-        openNew(scopeCollectionId);
+        openNew(scopeCategoryId);
         return;
       }
       if (meta && e.key === "\\") {
@@ -117,10 +130,16 @@ export function App() {
       }
       if (typing || meta || e.altKey) return;
 
-      if (e.key === "1" || e.key === "2" || e.key === "3") {
+      if (e.key === "1" || e.key === "2" || e.key === "3" || e.key === "0") {
         e.preventDefault();
         setScope(
-          e.key === "1" ? { kind: "all" } : e.key === "2" ? { kind: "favorites" } : { kind: "recent" },
+          e.key === "0"
+            ? { kind: "overview" }
+            : e.key === "1"
+            ? { kind: "all" }
+            : e.key === "2"
+            ? { kind: "favorites" }
+            : { kind: "recent" }
         );
       } else if (e.key === "?") {
         e.preventDefault();
@@ -136,7 +155,7 @@ export function App() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [openNew, overlayOpen, scopeCollectionId]);
+  }, [openNew, overlayOpen, scopeCategoryId]);
 
   /* ------------------------------ actions ---------------------------- */
   const actions = useMemo<ItemActions>(
@@ -158,7 +177,7 @@ export function App() {
       },
       toggleFavorite: (id) => {
         const found = getState().bookmarks.find((b) => b.id === id);
-        if (found) updateFavorite(id, !found.favorite);
+        if (found) updateFavorite(id, !(found.favorite || found.isFavorite));
       },
       open: (b) => window.open(b.url, "_blank", "noopener,noreferrer"),
       copy: (b) => {
@@ -167,10 +186,10 @@ export function App() {
           .then(() => pushToast(`Copied ${domainOf(b.url)}`))
           .catch(() => pushToast("Clipboard permission denied"));
       },
-      assign: (id, collectionId) => {
-        assignToCollection(id, collectionId);
-        const name = collectionId ? collectionById(getState(), collectionId)?.name : "Unfiled";
-        pushToast(`Moved to ${name ?? "Unfiled"}`);
+      assign: (id, categoryId) => {
+        assignToCategory(id, categoryId);
+        const name = categoryId ? categoryById(getState(), categoryId)?.name : "Uncategorized";
+        pushToast(`Moved to ${name ?? "Uncategorized"}`);
       },
       move: (id, direction) => moveWithinVisible(id, direction),
     }),
@@ -180,16 +199,19 @@ export function App() {
   /* ------------------------------- title ----------------------------- */
   const title = useMemo(() => {
     switch (lib.scope.kind) {
+      case "overview":
+        return "Overview";
       case "favorites":
         return "Favourites";
       case "recent":
         return "Recent";
+      case "category":
       case "collection":
-        return collectionById(lib, lib.scope.id ?? "")?.name ?? "Collection";
+        return categoryById(lib, lib.scope.id ?? "")?.name ?? "Category";
       case "tag":
         return `#${lib.scope.id ?? ""}`;
       default:
-        return "All items";
+        return "All Bookmarks";
     }
   }, [lib]);
 
@@ -209,8 +231,18 @@ export function App() {
 
   const editing: Bookmark | null =
     form?.mode === "edit" ? (lib.bookmarks.find((b) => b.id === form.id) ?? null) : null;
-  const editingCollection: Collection | null =
-    collectionForm?.id ? (lib.collections.find((c) => c.id === collectionForm.id) ?? null) : null;
+  const editingCategory: Category | null =
+    categoryForm?.id ? (lib.categories.find((c) => c.id === categoryForm.id) ?? null) : null;
+
+  // Unauthenticated user: show the beautiful authentication experience
+  if (lib.hydrated && !lib.authenticated) {
+    return (
+      <>
+        <AuthView />
+        <Toasts />
+      </>
+    );
+  }
 
   return (
     <div
@@ -221,33 +253,25 @@ export function App() {
       <Sidebar
         lib={lib}
         onNewBookmark={openNew}
-        onNewCollection={() => setCollectionForm({})}
-        onRenameCollection={(c) => setCollectionForm({ id: c.id })}
-        onDeleteCollection={(c) =>
+        onNewCategory={() => setCategoryForm({ mode: "new" })}
+        onEditCategory={(c) => setCategoryForm({ mode: "edit", id: c.id })}
+        onDeleteCategory={(c) =>
           setConfirmState({
             title: `Delete “${c.name}”?`,
-            body: `The ${
-              lib.bookmarks.filter((b) => b.collectionId === c.id).length
-            } links inside it will be kept and moved to Unfiled.`,
-            confirmLabel: "Delete collection",
+            body: `Bookmarks inside will be moved to Uncategorized and will not be deleted.`,
+            confirmLabel: "Delete category",
             onConfirm: () => {
-              deleteCollection(c.id);
-              pushToast(`Collection “${c.name}” deleted`);
+              deleteCategory(c.id);
+              pushToast(`Category “${c.name}” deleted`);
             },
           })
         }
+        onOpenSettings={() => setSettingsOpen(true)}
         onShowShortcuts={() => setShortcuts(true)}
-        onRestoreSamples={() =>
-          setConfirmState({
-            title: "Restore sample library?",
-            body: "Your current links and collections will be replaced with the built-in sample set. This cannot be undone.",
-            confirmLabel: "Replace library",
-            onConfirm: () => {
-              resetLibrary();
-              pushToast("Sample library restored");
-            },
-          })
-        }
+        onLogout={async () => {
+          await logoutUser();
+          pushToast("Signed out");
+        }}
         onScope={handleScope}
       />
 
@@ -258,13 +282,13 @@ export function App() {
           lib={lib}
           title={title}
           shown={shown}
-          total={lib.scope.kind === "all" ? lib.bookmarks.length : countFor(lib, lib.scope)}
+          total={lib.scope.kind === "all" || lib.scope.kind === "overview" ? lib.bookmarks.length : countFor(lib, lib.scope)}
           searchRef={searchRef}
           onToggleSidebar={() => {
             if (window.matchMedia("(max-width: 900px)").matches) setMobileNav((v) => !v);
             else toggleSidebar();
           }}
-          onNewBookmark={() => openNew(scopeCollectionId)}
+          onNewBookmark={() => openNew(scopeCategoryId)}
           onOpenPalette={() => setPaletteOpen(true)}
         />
 
@@ -273,7 +297,9 @@ export function App() {
             lib={lib}
             actions={actions}
             onTag={(tag) => setScope({ kind: "tag", id: tag })}
-            onNewBookmark={() => openNew(scopeCollectionId)}
+            onNewBookmark={() => openNew(scopeCategoryId)}
+            onNewCategory={() => setCategoryForm({ mode: "new" })}
+            onOpenPalette={() => setPaletteOpen(true)}
           />
         </main>
       </div>
@@ -283,8 +309,8 @@ export function App() {
         lib={lib}
         onClose={() => setPaletteOpen(false)}
         onScope={handleScope}
-        onNewBookmark={() => openNew(scopeCollectionId)}
-        onNewCollection={() => setCollectionForm({})}
+        onNewBookmark={() => openNew(scopeCategoryId)}
+        onNewCollection={() => setCategoryForm({ mode: "new" })}
         onEditBookmark={(id) => setForm({ mode: "edit", id })}
         onCycleTheme={cycleTheme}
         onShowShortcuts={() => setShortcuts(true)}
@@ -293,38 +319,68 @@ export function App() {
       <BookmarkDialog
         open={!!form}
         bookmark={editing}
-        collections={lib.collections}
-        defaultCollectionId={form?.mode === "new" ? newDefaultCollectionId : (editing?.collectionId ?? null)}
+        collections={lib.categories}
+        defaultCollectionId={form?.mode === "new" ? newDefaultCategoryId : (editing?.categoryId ?? editing?.collectionId ?? null)}
         onClose={() => setForm(null)}
         onSubmit={(values) => {
           if (editing) {
-            updateBookmark(editing.id, values);
+            updateBookmark(editing.id, {
+              title: values.title,
+              url: values.url,
+              description: values.description,
+              categoryId: values.collectionId,
+              collectionId: values.collectionId,
+              tags: values.tags,
+              favorite: values.favorite,
+              isFavorite: values.favorite,
+            });
             pushToast("Bookmark updated");
           } else {
-            addBookmark(values);
-            pushToast("Bookmark added");
+            addBookmark({
+              title: values.title,
+              url: values.url,
+              description: values.description,
+              categoryId: values.collectionId,
+              collectionId: values.collectionId,
+              tags: values.tags,
+              favorite: values.favorite,
+            });
+            pushToast("Bookmark added to your library");
           }
           setForm(null);
         }}
       />
 
-      <CollectionDialog
-        open={!!collectionForm}
-        isNew={!collectionForm?.id}
-        name={editingCollection?.name ?? ""}
-        icon={editingCollection?.icon ?? "folder"}
-        onClose={() => setCollectionForm(null)}
-        onSubmit={({ name, icon: glyph }) => {
-          if (collectionForm?.id) {
-            updateCollection(collectionForm.id, { name, icon: glyph });
-            pushToast("Collection renamed");
+      <CategoryDialog
+        open={!!categoryForm}
+        isNew={categoryForm?.mode === "new"}
+        name={editingCategory?.name ?? ""}
+        icon={editingCategory?.icon ?? "folder"}
+        color={editingCategory?.color ?? "#0a7aff"}
+        onClose={() => setCategoryForm(null)}
+        onSubmit={(values: CategoryFormData) => {
+          if (categoryForm?.id) {
+            updateCategory(categoryForm.id, values);
+            pushToast("Category updated");
           } else {
-            const created = addCollection(name, glyph);
-            setScope({ kind: "collection", id: created.id });
-            pushToast(`Created “${created.name}”`);
+            const created = addCategory(values.name, values.icon, values.color);
+            setScope({ kind: "category", id: created.id });
+            pushToast(`Created category “${created.name}”`);
           }
-          setCollectionForm(null);
+          setCategoryForm(null);
         }}
+      />
+
+      <SettingsDialog
+        open={settingsOpen}
+        lib={lib}
+        onClose={() => setSettingsOpen(false)}
+      />
+
+      <OnboardingModal
+        open={lib.authenticated && !lib.onboarded}
+        userName={lib.user?.name}
+        onComplete={() => {}}
       />
 
       <ShortcutsDialog open={shortcuts} onClose={() => setShortcuts(false)} />

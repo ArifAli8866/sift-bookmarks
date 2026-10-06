@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAuthUser } from "../../../../lib/auth";
-import { deleteUserCategory, upsertUserCategory, queryOne } from "../../../../lib/db";
-import type { Collection } from "../../../../lib/store";
+import { deleteUserCategory, query, queryOne, ensureTables } from "../../../../lib/db";
+import type { Category } from "../../../../lib/store";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +16,9 @@ export async function DELETE(
     }
 
     const { id } = await params;
+    // As per requirement: deleteUserCategory moves bookmarks to uncategorized and deletes the category
     await deleteUserCategory(user.id, id);
+
     return NextResponse.json({ success: true, id });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
@@ -34,11 +36,19 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    await ensureTables();
     const { id } = await params;
-    const patch = (await request.json()) as Partial<Collection>;
+    const patch = (await request.json()) as Partial<Category>;
 
-    const existing = await queryOne<{ id: string; name: string; icon: string; color: string; position: number }>(
-      `SELECT id, name, icon, color, position FROM sift_categories WHERE id = $1 AND user_id = $2`,
+    const existing = await queryOne<{
+      id: string;
+      name: string;
+      icon: string;
+      color: string;
+      position: number;
+    }>(
+      `SELECT id, name, icon, color, position
+       FROM sift_categories WHERE id = $1 AND user_id = $2`,
       [id, user.id]
     );
 
@@ -48,14 +58,26 @@ export async function PATCH(
 
     const name = patch.name !== undefined ? patch.name.trim() || existing.name : existing.name;
     const icon = patch.icon !== undefined ? patch.icon : existing.icon;
-    const color = (patch as any).color !== undefined ? (patch as any).color : existing.color;
-    const position = (patch as any).position !== undefined ? (patch as any).position : existing.position;
+    const color = patch.color !== undefined ? patch.color : existing.color;
+    const position = patch.position !== undefined ? patch.position : existing.position;
 
-    await upsertUserCategory(user.id, { id, name, icon, color, position });
+    await query(
+      `UPDATE sift_categories
+       SET name = $1, icon = $2, color = $3, position = $4, updated_at = NOW()
+       WHERE id = $5 AND user_id = $6`,
+      [name, icon, color, position, id, user.id]
+    );
 
     return NextResponse.json({
       success: true,
-      collection: { id, userId: user.id, name, icon, color, position },
+      category: {
+        id,
+        userId: user.id,
+        name,
+        icon,
+        color,
+        position,
+      },
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);

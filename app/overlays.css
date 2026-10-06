@@ -800,3 +800,623 @@
   color: var(--accent);
   box-shadow: 0 0.5px 2px rgba(16, 16, 22, 0.12), var(--top-highlight);
 }
+
+/* =====================================================================
+   Authentication Screen (Clean, airy, modular card)
+   ===================================================================== */
+
+.auth-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: 24px 16px;
+  background: var(--content);
+}
+
+.auth-card {
+  width: 420px;
+  max-width: 100%;
+  padding: 32px 28px;
+  border-radius: var(--r-modal);
+  background: var(--surface);
+  border: 0.5px solid var(--edge);
+  box-shadow: var(--shadow-modal), var(--top-highlight);
+  animation: pop-in var(--t-fast) var(--ease-out) both;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.auth-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.auth-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.35), 0 1px 2px rgba(10, 90, 200, 0.3);
+}
+
+.auth-brand-name {
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  color: var(--text);
+}
+
+.auth-title {
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.022em;
+  color: var(--text);
+  margin: 0 0 5px 0;
+}
+
+.auth-subtitle {
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.auth-social {
+  margin-bottom: 16px;
+}
+
+.auth-google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 38px;
+  border-radius: var(--r-btn);
+  background: var(--surface);
+  border: 0.5px solid var(--edge-strong);
+  color: var(--text);
+  font-size: var(--fs-base);
+  font-weight: 590;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: background-color var(--t-tint) var(--ease-out),
+    border-color var(--t-fast) var(--ease-out);
+}
+
+.auth-google-btn:hover {
+  background: var(--tint-hover);
+  border-color: var(--edge-strong);
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.auth-divider-line {
+  flex: 1;
+  height: 0.5px;
+  background: var(--separator);
+}
+
+.auth-divider-text {
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  color: var(--text-4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.auth-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--r-field);
+  background: var(--danger-soft);
+  border: 0.5px solid var(--danger);
+  color: var(--danger);
+  font-size: var(--fs-sm);
+  margin-bottom: 14px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.auth-label {
+  font-size: var(--fs-micro);
+  font-weight: 590;
+  color: var(--text-3);
+  letter-spacing: 0.01em;
+}
+
+.auth-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 35px;
+  border-radius: var(--r-field);
+  background: var(--surface-sunken);
+  border: 0.5px solid var(--edge);
+  transition: border-color var(--t-fast) var(--ease-out);
+}
+
+.auth-input-wrap:focus-within {
+  border-color: var(--accent);
+  outline: 2px solid var(--accent-ring);
+}
+
+.auth-input-icon {
+  position: absolute;
+  left: 10px;
+  color: var(--text-4);
+  pointer-events: none;
+}
+
+.auth-input-wrap input {
+  width: 100%;
+  height: 100%;
+  padding: 0 10px 0 32px;
+  background: transparent;
+  border: none;
+  font-size: var(--fs-base);
+  color: var(--text);
+  outline: none;
+}
+
+.auth-submit-btn {
+  width: 100%;
+  height: 36px;
+  margin-top: 4px;
+  border-radius: var(--r-btn);
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-size: var(--fs-base);
+  font-weight: 590;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(10, 122, 255, 0.3);
+  transition: background-color var(--t-tint) var(--ease-out);
+}
+
+.auth-submit-btn:hover {
+  background: var(--accent-hover);
+}
+
+.auth-btn-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.auth-toggle {
+  text-align: center;
+  margin-top: 16px;
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+}
+
+.auth-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.auth-toggle-btn:hover {
+  text-decoration: underline;
+}
+
+/* =====================================================================
+   Onboarding Wizard Overlay & Steps
+   ===================================================================== */
+
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  background: var(--scrim);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: overlay-fade-in var(--t-base) var(--ease-out) both;
+}
+
+.onboarding-card {
+  width: 480px;
+  max-width: 100%;
+  padding: 30px 28px;
+  border-radius: var(--r-modal);
+  background: var(--surface);
+  border: 0.5px solid var(--edge-strong);
+  box-shadow: var(--shadow-modal), var(--top-highlight);
+  animation: pop-in var(--t-fast) var(--ease-out) both;
+}
+
+.onboarding-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 22px;
+}
+
+.onboarding-step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--tint-strong);
+  transition: background-color var(--t-fast) var(--ease-out);
+}
+
+.onboarding-step-dot.is-active {
+  background: var(--accent);
+}
+
+.onboarding-step-line {
+  width: 24px;
+  height: 2px;
+  background: var(--tint-strong);
+  border-radius: var(--r-pill);
+}
+
+.onboarding-step-line.is-active {
+  background: var(--accent);
+}
+
+.onboarding-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.onboarding-icon-banner {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.onboarding-sparkle-mark {
+  font-size: 32px;
+}
+
+.onboarding-title {
+  font-size: 20px;
+  font-weight: 650;
+  letter-spacing: -0.022em;
+  color: var(--text);
+  margin: 0 0 6px 0;
+  text-align: center;
+}
+
+.onboarding-desc {
+  font-size: var(--fs-base);
+  color: var(--text-3);
+  margin: 0 0 20px 0;
+  text-align: center;
+  line-height: 1.45;
+}
+
+.onboarding-features-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--tint);
+  border-radius: var(--r-card);
+  margin-bottom: 24px;
+}
+
+.onboarding-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+}
+
+.onboarding-category-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.onboarding-cat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--r-pill);
+  border: 0.5px solid var(--edge);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: all var(--t-fast) var(--ease-out);
+}
+
+.onboarding-cat-pill:hover {
+  border-color: var(--edge-strong);
+  color: var(--text);
+}
+
+.onboarding-cat-pill.is-selected {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.onboarding-cat-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--r-pill);
+  flex-shrink: 0;
+}
+
+.onboarding-check-mark {
+  margin-left: 2px;
+  color: var(--accent);
+}
+
+.onboarding-bookmarks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 240px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding-right: 4px;
+}
+
+.onboarding-bookmark-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--r-row);
+  border: 0.5px solid var(--separator-soft);
+  background: var(--surface-sunken);
+  cursor: pointer;
+  user-select: none;
+}
+
+.onboarding-bookmark-row.is-checked {
+  background: var(--accent-soft);
+  border-color: var(--accent-ring);
+}
+
+.onboarding-bm-info {
+  flex: 1;
+}
+
+.onboarding-bm-title {
+  font-size: var(--fs-base);
+  font-weight: 590;
+  color: var(--text);
+}
+
+.onboarding-bm-desc {
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+}
+
+.onboarding-bm-badge {
+  font-size: var(--fs-micro);
+  padding: 2px 6px;
+  border-radius: var(--r-pill);
+  background: var(--tint);
+  color: var(--text-4);
+}
+
+.onboarding-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--s2);
+  padding-top: 14px;
+  border-top: 0.5px solid var(--separator-soft);
+}
+
+/* =====================================================================
+   Category Dialog & Color Swatches
+   ===================================================================== */
+
+.color-swatch-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 4px 0;
+}
+
+.color-swatch-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-pill);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: transform var(--t-micro) var(--ease-out);
+}
+
+.color-swatch-btn:hover {
+  transform: scale(1.15);
+}
+
+.color-swatch-btn[data-selected="true"] {
+  border-color: var(--text);
+}
+
+.color-swatch-check {
+  font-size: 11px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.category-preview-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  background: var(--tint);
+  border: 0.5px solid var(--separator);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  width: fit-content;
+}
+
+/* =====================================================================
+   Settings Dialog Styles
+   ===================================================================== */
+
+.settings-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 18px;
+  border-bottom: 0.5px solid var(--separator-soft);
+}
+
+.settings-section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.settings-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.settings-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-avatar-preview {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-pill);
+  overflow: hidden;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+  font-weight: 650;
+  flex: none;
+}
+
+.settings-avatar-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.settings-avatar-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-user-name {
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.settings-user-email {
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+}
+
+.settings-theme-row {
+  display: flex;
+  gap: 8px;
+}
+
+.settings-theme-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--r-btn);
+  border: 0.5px solid var(--edge);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease-out);
+}
+
+.settings-theme-btn:hover {
+  border-color: var(--edge-strong);
+  color: var(--text);
+}
+
+.settings-theme-btn.is-active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.settings-field-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+}
+
+.settings-field-label {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.settings-field-desc {
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+}

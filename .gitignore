@@ -20,5 +20,6 @@ tsconfig.tsbuildinfo
 .pki
 .config
 .sudo_as_admin_successful
+.data
 
 

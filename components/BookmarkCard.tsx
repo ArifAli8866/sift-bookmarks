@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { Favicon } from "./Favicon";
 import { Icon } from "./Icon";
 import { splitUrl, shortRelative, fullDate } from "../lib/format";
-import type { Bookmark } from "../lib/store";
+import { markBookmarkOpened, type Bookmark } from "../lib/store";
 import type { ItemActions } from "./itemActions";
 
 export function BookmarkCard({
@@ -15,6 +15,7 @@ export function BookmarkCard({
   onFocus,
   onMenu,
   onTag,
+  category,
 }: {
   bookmark: Bookmark;
   index: number;
@@ -23,6 +24,7 @@ export function BookmarkCard({
   onFocus: (id: string) => void;
   onMenu: (bookmark: Bookmark, anchor: HTMLElement) => void;
   onTag: (tag: string) => void;
+  category?: { name: string; color?: string; icon?: string };
 }) {
   const [ticking, setTicking] = useState(false);
   const timer = useRef<number | undefined>(undefined);
@@ -30,11 +32,18 @@ export function BookmarkCard({
   const visibleTags = bookmark.tags.slice(0, 2);
   const overflow = bookmark.tags.length - visibleTags.length;
 
-  const toggleFav = () => {
+  const toggleFav = (e: React.MouseEvent) => {
+    e.stopPropagation();
     actions.toggleFavorite(bookmark.id);
     setTicking(true);
     window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => setTicking(false), 320);
+  };
+
+  const handleLinkClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    markBookmarkOpened(bookmark.id);
+    onFocus(bookmark.id);
   };
 
   return (
@@ -49,66 +58,90 @@ export function BookmarkCard({
       }}
     >
       <div className="card-head">
-        <Favicon url={bookmark.url} />
-        <h3 className="card-title truncate">
-          <a
-            className="card-link"
-            data-stretch=""
-            href={bookmark.url}
-            target="_blank"
-            rel="noreferrer noopener"
-            draggable={false}
-            tabIndex={focused ? 0 : -1}
-            onFocus={() => onFocus(bookmark.id)}
-            onClick={(e) => {
-              e.stopPropagation();
-              onFocus(bookmark.id);
-            }}
-          >
-            {bookmark.title}
-          </a>
-        </h3>
+        <div className="card-icon-wrap">
+          <Favicon url={bookmark.url} size={20} />
+        </div>
+        <div className="card-title-col truncate">
+          <h3 className="card-title truncate">
+            <a
+              className="card-link"
+              data-stretch=""
+              href={bookmark.url}
+              target="_blank"
+              rel="noreferrer noopener"
+              draggable={false}
+              tabIndex={focused ? 0 : -1}
+              onFocus={() => onFocus(bookmark.id)}
+              onClick={handleLinkClick}
+            >
+              {bookmark.title}
+            </a>
+          </h3>
+          <p className="card-url" title={bookmark.url}>
+            <span className="card-url-host">{host}</span>
+            <span className="card-url-path">{path}</span>
+          </p>
+        </div>
       </div>
 
-      <p className="card-url" title={bookmark.url}>
-        <span className="card-url-host">{host}</span>
-        <span className="card-url-path">{path}</span>
-      </p>
+      {bookmark.description ? (
+        <p className="card-desc" title={bookmark.description}>
+          {bookmark.description}
+        </p>
+      ) : null}
 
       <div className="card-foot">
-        {visibleTags.map((tag) => (
+        {category ? (
+          <span className="card-cat-pill" title={`Category: ${category.name}`}>
+            <span
+              className="card-cat-dot"
+              style={{ backgroundColor: category.color || "var(--accent)" }}
+            />
+            <span className="truncate">{category.name}</span>
+          </span>
+        ) : visibleTags.map((tag) => (
           <button
             key={tag}
             type="button"
             className="chip chip-btn"
             title={`Filter by #${tag}`}
-            onClick={() => onTag(tag)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onTag(tag);
+            }}
           >
-            {tag}
+            #{tag}
           </button>
         ))}
-        {overflow > 0 ? <span className="chip">+{overflow}</span> : null}
+
+        {overflow > 0 && !category ? <span className="chip">+{overflow}</span> : null}
+
         <span className="spacer" />
-        <span className="card-age" title={fullDate(bookmark.addedAt)}>
-          {shortRelative(bookmark.addedAt)}
+
+        <span className="card-age" title={fullDate(bookmark.lastOpenedAt || bookmark.addedAt)}>
+          {shortRelative(bookmark.lastOpenedAt || bookmark.addedAt)}
         </span>
+
         <span className="card-actions">
           <button
             type="button"
             className={`icon-btn fav-btn${ticking ? " is-ticked" : ""}`}
-            aria-pressed={bookmark.favorite}
-            aria-label={bookmark.favorite ? `Unfavourite ${bookmark.title}` : `Favourite ${bookmark.title}`}
-            title={bookmark.favorite ? "Remove favourite (F)" : "Add favourite (F)"}
+            aria-pressed={bookmark.favorite || bookmark.isFavorite}
+            aria-label={bookmark.favorite || bookmark.isFavorite ? `Unfavourite ${bookmark.title}` : `Favourite ${bookmark.title}`}
+            title={bookmark.favorite || bookmark.isFavorite ? "Remove favourite (F)" : "Add favourite (F)"}
             onClick={toggleFav}
           >
-            <Icon name="star" size={13} filled={bookmark.favorite} />
+            <Icon name="star" size={13} filled={bookmark.favorite || bookmark.isFavorite} />
           </button>
           <button
             type="button"
             className="icon-btn more-btn"
             aria-label={`Actions for ${bookmark.title}`}
             title="Actions"
-            onClick={(e) => onMenu(bookmark, e.currentTarget)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onMenu(bookmark, e.currentTarget);
+            }}
           >
             <Icon name="ellipsis" size={13} />
           </button>
@@ -127,6 +160,7 @@ export function BookmarkRow({
   onMenu,
   onTag,
   collectionName,
+  categoryColor,
 }: {
   bookmark: Bookmark;
   index: number;
@@ -136,9 +170,16 @@ export function BookmarkRow({
   onMenu: (bookmark: Bookmark, anchor: HTMLElement) => void;
   onTag: (tag: string) => void;
   collectionName?: string;
+  categoryColor?: string;
 }) {
   const { host, path } = splitUrl(bookmark.url);
   const tag = bookmark.tags[0];
+
+  const handleLinkClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    markBookmarkOpened(bookmark.id);
+    onFocus(bookmark.id);
+  };
 
   return (
     <div
@@ -163,6 +204,7 @@ export function BookmarkRow({
             draggable={false}
             tabIndex={focused ? 0 : -1}
             onFocus={() => onFocus(bookmark.id)}
+            onClick={handleLinkClick}
           >
             {bookmark.title}
           </a>
@@ -175,34 +217,48 @@ export function BookmarkRow({
       </p>
 
       <div className="row-col row-col-tags" title={tag ? `#${tag}` : undefined}>
-        {tag ? (
+        {collectionName ? (
+          <span className="card-cat-pill">
+            <span
+              className="card-cat-dot"
+              style={{ backgroundColor: categoryColor || "var(--accent)" }}
+            />
+            <span className="truncate">{collectionName}</span>
+          </span>
+        ) : tag ? (
           <button type="button" className="chip" onClick={() => onTag(tag)}>
-            {tag}
+            #{tag}
           </button>
         ) : (
-          <span className="truncate">{collectionName ?? "Unfiled"}</span>
+          <span className="truncate" style={{ color: "var(--text-4)" }}>Uncategorized</span>
         )}
       </div>
 
-      <div className="row-col row-col-age" title={fullDate(bookmark.addedAt)}>
-        {shortRelative(bookmark.addedAt)}
+      <div className="row-col row-col-age" title={fullDate(bookmark.lastOpenedAt || bookmark.addedAt)}>
+        {shortRelative(bookmark.lastOpenedAt || bookmark.addedAt)}
       </div>
 
       <div className="row-actions">
         <button
           type="button"
           className="icon-btn fav-btn"
-          aria-pressed={bookmark.favorite}
-          aria-label={bookmark.favorite ? "Unfavourite" : "Favourite"}
-          onClick={() => actions.toggleFavorite(bookmark.id)}
+          aria-pressed={bookmark.favorite || bookmark.isFavorite}
+          aria-label={bookmark.favorite || bookmark.isFavorite ? "Unfavourite" : "Favourite"}
+          onClick={(e) => {
+            e.stopPropagation();
+            actions.toggleFavorite(bookmark.id);
+          }}
         >
-          <Icon name="star" size={13} filled={bookmark.favorite} />
+          <Icon name="star" size={13} filled={bookmark.favorite || bookmark.isFavorite} />
         </button>
         <button
           type="button"
           className="icon-btn more-btn"
           aria-label={`Actions for ${bookmark.title}`}
-          onClick={(e) => onMenu(bookmark, e.currentTarget)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onMenu(bookmark, e.currentTarget);
+          }}
         >
           <Icon name="ellipsis" size={13} />
         </button>

@@ -1,32 +1,51 @@
-import { seedLibrary } from "./seed";
 import { uid } from "./format";
 
 export type ViewMode = "grid" | "list";
 export type SortKey = "manual" | "added" | "title" | "domain";
 export type ThemeMode = "system" | "light" | "dark";
-export type ScopeKind = "all" | "favorites" | "recent" | "collection" | "tag";
+export type ScopeKind = "overview" | "all" | "favorites" | "recent" | "category" | "collection" | "tag";
 
 export interface Scope {
   kind: ScopeKind;
   id?: string;
 }
 
-export interface Bookmark {
-  id: string;
-  title: string;
-  url: string;
-  collectionId: string | null;
-  tags: string[];
-  favorite: boolean;
-  addedAt: number;
-  order: number;
-}
-
-export interface Collection {
+export interface User {
   id: string;
   name: string;
-  icon: string;
+  email: string;
+  image?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
 }
+
+export interface Bookmark {
+  id: string;
+  userId?: string;
+  title: string;
+  url: string;
+  description?: string;
+  categoryId?: string | null;
+  collectionId?: string | null; // alias for backwards compatibility
+  iconUrl?: string;
+  tags: string[];
+  favorite: boolean;
+  isFavorite?: boolean;
+  addedAt: number;
+  order: number;
+  position?: number;
+  lastOpenedAt?: number | null;
+}
+
+export interface Category {
+  id: string;
+  userId?: string;
+  name: string;
+  icon: string;
+  color?: string;
+  position?: number;
+}
+export type Collection = Category; // alias
 
 export interface Prefs {
   viewMode: ViewMode;
@@ -39,16 +58,18 @@ export type SyncStatus = "local" | "syncing" | "synced" | "error";
 
 export interface LibraryState {
   hydrated: boolean;
+  loading: boolean;
+  authenticated: boolean;
+  user: User | null;
+  onboarded: boolean;
   bookmarks: Bookmark[];
-  collections: Collection[];
+  categories: Category[];
+  collections: Category[]; // alias
   prefs: Prefs;
   scope: Scope;
   query: string;
   syncStatus: SyncStatus;
 }
-
-const KEY = "sift.library.v1";
-const PREFS_KEY = "sift.prefs.v1";
 
 const DEFAULT_PREFS: Prefs = {
   viewMode: "grid",
@@ -57,15 +78,19 @@ const DEFAULT_PREFS: Prefs = {
   sidebarCollapsed: false,
 };
 
-/** Returned for every server render and every pre-hydration render. */
 export const INITIAL_STATE: LibraryState = {
   hydrated: false,
+  loading: true,
+  authenticated: false,
+  user: null,
+  onboarded: true,
   bookmarks: [],
+  categories: [],
   collections: [],
   prefs: DEFAULT_PREFS,
-  scope: { kind: "all" },
+  scope: { kind: "overview" },
   query: "",
-  syncStatus: "local",
+  syncStatus: "synced",
 };
 
 let state: LibraryState = INITIAL_STATE;
@@ -78,59 +103,6 @@ function emit() {
 function write(next: Partial<LibraryState>) {
   state = { ...state, ...next };
   emit();
-}
-
-let saveTimer: number | undefined;
-let cloudTimer: number | undefined;
-
-export async function syncToCloud(): Promise<boolean> {
-  if (typeof window === "undefined" || !state.hydrated) return false;
-  try {
-    write({ syncStatus: "syncing" });
-    const res = await fetch("/api/library", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        bookmarks: state.bookmarks,
-        collections: state.collections,
-        prefs: state.prefs,
-      }),
-    });
-    if (!res.ok) {
-      write({ syncStatus: "error" });
-      return false;
-    }
-    const data = await res.json();
-    if (data.connected) {
-      write({ syncStatus: "synced" });
-      return true;
-    } else {
-      write({ syncStatus: "local" });
-      return false;
-    }
-  } catch {
-    write({ syncStatus: "local" });
-    return false;
-  }
-}
-
-function persist() {
-  if (typeof window === "undefined" || !state.hydrated) return;
-  window.clearTimeout(saveTimer);
-  saveTimer = window.setTimeout(() => {
-    try {
-      const { prefs, bookmarks, collections } = state;
-      localStorage.setItem(KEY, JSON.stringify({ version: 1, bookmarks, collections }));
-      localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
-    } catch {
-      /* private mode / quota — the app keeps working in memory */
-    }
-  }, 140);
-
-  window.clearTimeout(cloudTimer);
-  cloudTimer = window.setTimeout(() => {
-    syncToCloud();
-  }, 600);
 }
 
 export function subscribe(listener: () => void): () => void {
@@ -146,90 +118,244 @@ export function getServerState(): LibraryState {
   return INITIAL_STATE;
 }
 
+/* ------------------------------------------------------------------ */
+/* Hydration & Backend Synchronization                                */
+/* ------------------------------------------------------------------ */
+
 export async function hydrate() {
-  if (state.hydrated || typeof window === "undefined") return;
-  let bookmarks: Bookmark[] = [];
-  let collections: Collection[] = [];
-  let prefs = DEFAULT_PREFS;
-  let hasLocalData = false;
+  if (typeof window === "undefined") return;
+
+  write({ loading: true });
 
   try {
-    const rawLib = localStorage.getItem(KEY);
-    const rawPrefs = localStorage.getItem(PREFS_KEY);
-    const parsed = rawLib ? JSON.parse(rawLib) : null;
-    if (
-      parsed &&
-      Array.isArray(parsed.bookmarks) &&
-      Array.isArray(parsed.collections) &&
-      parsed.bookmarks.length > 0
-    ) {
-      bookmarks = parsed.bookmarks as Bookmark[];
-      collections = parsed.collections as Collection[];
-      hasLocalData = true;
-    } else {
-      const seeded = seedLibrary();
-      bookmarks = seeded.bookmarks;
-      collections = seeded.collections;
-    }
-    if (rawPrefs) prefs = { ...DEFAULT_PREFS, ...(JSON.parse(rawPrefs) as Partial<Prefs>) };
-  } catch {
-    const seeded = seedLibrary();
-    bookmarks = seeded.bookmarks;
-    collections = seeded.collections;
-  }
-
-  write({ hydrated: true, bookmarks, collections, prefs, syncStatus: "local" });
-
-  // Check if Neon PostgreSQL is connected and has data
-  try {
-    const res = await fetch("/api/library");
-    if (res.ok) {
-      const cloud = await res.json();
-      if (cloud.connected) {
-        if (!cloud.empty && Array.isArray(cloud.bookmarks) && cloud.bookmarks.length > 0) {
+    const authRes = await fetch("/api/auth/me");
+    if (authRes.ok) {
+      const authData = await authRes.json();
+      if (authData.authenticated && authData.user) {
+        // Authenticated user: fetch their library
+        const libRes = await fetch("/api/library");
+        if (libRes.ok) {
+          const libData = await libRes.json();
+          const categories = libData.categories || [];
           write({
-            bookmarks: cloud.bookmarks,
-            collections: cloud.collections || [],
-            prefs: cloud.prefs ? { ...DEFAULT_PREFS, ...cloud.prefs } : state.prefs,
+            hydrated: true,
+            loading: false,
+            authenticated: true,
+            user: authData.user,
+            onboarded: authData.settings?.onboarded ?? true,
+            bookmarks: libData.bookmarks || [],
+            categories,
+            collections: categories,
+            prefs: libData.prefs ? { ...DEFAULT_PREFS, ...libData.prefs } : state.prefs,
             syncStatus: "synced",
           });
-          try {
-            localStorage.setItem(KEY, JSON.stringify({ version: 1, bookmarks: cloud.bookmarks, collections: cloud.collections }));
-          } catch {}
-        } else if (hasLocalData || bookmarks.length > 0) {
-          await syncToCloud();
+          return;
         }
       }
     }
-  } catch {
-    // Offline or fallback to local storage
+
+    // Unauthenticated
+    write({
+      hydrated: true,
+      loading: false,
+      authenticated: false,
+      user: null,
+      onboarded: true,
+      bookmarks: [],
+      categories: [],
+      collections: [],
+      syncStatus: "synced",
+    });
+  } catch (err) {
+    console.error("Hydration error:", err);
+    write({
+      hydrated: true,
+      loading: false,
+      authenticated: false,
+      user: null,
+      bookmarks: [],
+      categories: [],
+      collections: [],
+      syncStatus: "error",
+    });
   }
 }
 
-export function resetLibrary() {
-  const seeded = seedLibrary();
-  write({ bookmarks: seeded.bookmarks, collections: seeded.collections, scope: { kind: "all" }, query: "" });
-  persist();
+export async function syncToCloud(): Promise<boolean> {
+  if (!state.authenticated) return false;
+  try {
+    write({ syncStatus: "syncing" });
+    const res = await fetch("/api/library", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        bookmarks: state.bookmarks,
+        categories: state.categories,
+        prefs: state.prefs,
+      }),
+    });
+    if (res.ok) {
+      write({ syncStatus: "synced" });
+      return true;
+    } else {
+      write({ syncStatus: "error" });
+      return false;
+    }
+  } catch {
+    write({ syncStatus: "error" });
+    return false;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Authentication Actions                                              */
+/* ------------------------------------------------------------------ */
+
+export async function loginUser(email: string, password: string): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      return { ok: false, error: data.error || "Login failed" };
+    }
+
+    await hydrate();
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "Network error during login" };
+  }
+}
+
+export async function registerUser(
+  email: string,
+  password: string,
+  confirmPassword?: string,
+  name?: string
+): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, confirmPassword, name }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      return { ok: false, error: data.error || "Registration failed" };
+    }
+
+    await hydrate();
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "Network error during registration" };
+  }
+}
+
+export async function loginWithGoogle(profile?: {
+  name?: string;
+  email?: string;
+  image?: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const res = await fetch("/api/auth/google", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(profile || {}),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      return { ok: false, error: data.error || "Google sign-in failed" };
+    }
+
+    await hydrate();
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "Network error during Google sign-in" };
+  }
+}
+
+export async function logoutUser(): Promise<void> {
+  try {
+    await fetch("/api/auth/logout", { method: "POST" });
+  } catch {}
+  write({
+    authenticated: false,
+    user: null,
+    bookmarks: [],
+    categories: [],
+    collections: [],
+    scope: { kind: "overview" },
+  });
+}
+
+export async function finishOnboarding(payload: {
+  categories?: string[];
+  bookmarks?: any[];
+  skipped?: boolean;
+}): Promise<boolean> {
+  try {
+    const res = await fetch("/api/auth/onboarding", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) {
+      write({ onboarded: true });
+      await hydrate();
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+export async function updateProfile(patch: { name?: string; image?: string }): Promise<boolean> {
+  if (!state.user) return false;
+  try {
+    const res = await fetch("/api/settings", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      write({ user: data.user });
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
 }
 
 /* ------------------------------------------------------------------ */
 /* Selectors                                                           */
 /* ------------------------------------------------------------------ */
 
-export function collectionById(s: LibraryState, id: string | null) {
-  return id ? s.collections.find((c) => c.id === id) : undefined;
+export function categoryById(s: LibraryState, id: string | null) {
+  return id ? s.categories.find((c) => c.id === id) : undefined;
 }
+export const collectionById = categoryById;
 
 export function countFor(s: LibraryState, scope: Scope): number {
   switch (scope.kind) {
+    case "overview":
     case "all":
       return s.bookmarks.length;
     case "favorites":
-      return s.bookmarks.filter((b) => b.favorite).length;
+      return s.bookmarks.filter((b) => b.favorite || b.isFavorite).length;
     case "recent":
-      return s.bookmarks.filter((b) => Date.now() - b.addedAt < 1000 * 60 * 60 * 24 * 7).length;
+      return s.bookmarks.filter((b) => {
+        if (b.lastOpenedAt) return Date.now() - b.lastOpenedAt < 1000 * 60 * 60 * 24 * 7;
+        return Date.now() - b.addedAt < 1000 * 60 * 60 * 24 * 7;
+      }).length;
+    case "category":
     case "collection":
-      return s.bookmarks.filter((b) => b.collectionId === scope.id).length;
+      return s.bookmarks.filter((b) => (b.categoryId || b.collectionId) === scope.id).length;
     case "tag":
       return s.bookmarks.filter((b) => b.tags.includes(scope.id ?? "")).length;
   }
@@ -239,26 +365,41 @@ export function visibleBookmarks(s: LibraryState): Bookmark[] {
   const q = s.query.trim().toLowerCase();
   let list = s.bookmarks.filter((b) => {
     switch (s.scope.kind) {
+      case "overview":
       case "all":
         return true;
       case "favorites":
-        return b.favorite;
+        return b.favorite || b.isFavorite;
       case "recent":
+        if (b.lastOpenedAt) return Date.now() - b.lastOpenedAt < 1000 * 60 * 60 * 24 * 14;
         return Date.now() - b.addedAt < 1000 * 60 * 60 * 24 * 7;
+      case "category":
       case "collection":
-        return b.collectionId === s.scope.id;
+        return (b.categoryId || b.collectionId) === s.scope.id;
       case "tag":
         return b.tags.includes(s.scope.id ?? "");
     }
   });
 
   if (q) {
-    list = list.filter(
-      (b) =>
+    list = list.filter((b) => {
+      const cat = categoryById(s, b.categoryId || b.collectionId || null);
+      return (
         b.title.toLowerCase().includes(q) ||
         b.url.toLowerCase().includes(q) ||
-        b.tags.some((t) => t.toLowerCase().includes(q)),
-    );
+        (b.description && b.description.toLowerCase().includes(q)) ||
+        (cat && cat.name.toLowerCase().includes(q)) ||
+        b.tags.some((t) => t.toLowerCase().includes(q))
+      );
+    });
+  }
+
+  if (s.scope.kind === "recent") {
+    return [...list].sort((a, b) => {
+      const timeA = a.lastOpenedAt || a.addedAt;
+      const timeB = b.lastOpenedAt || b.addedAt;
+      return timeB - timeA;
+    });
   }
 
   switch (s.prefs.sortKey) {
@@ -270,7 +411,7 @@ export function visibleBookmarks(s: LibraryState): Bookmark[] {
       return [...list].sort((a, b) => hostname(a).localeCompare(hostname(b)));
     case "manual":
     default:
-      return [...list].sort((a, b) => a.order - b.order);
+      return [...list].sort((a, b) => (a.position ?? a.order) - (b.position ?? b.order));
   }
 }
 
@@ -291,7 +432,7 @@ export function tagCounts(s: LibraryState): { tag: string; count: number }[] {
 }
 
 /* ------------------------------------------------------------------ */
-/* Actions                                                             */
+/* State Actions                                                       */
 /* ------------------------------------------------------------------ */
 
 export function setScope(scope: Scope) {
@@ -304,7 +445,13 @@ export function setQuery(query: string) {
 
 export function setPrefs(patch: Partial<Prefs>) {
   write({ prefs: { ...state.prefs, ...patch } });
-  persist();
+  if (state.authenticated) {
+    fetch("/api/settings", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    }).catch(() => {});
+  }
 }
 
 export function toggleSidebar() {
@@ -314,24 +461,41 @@ export function toggleSidebar() {
 export function addBookmark(input: {
   title: string;
   url: string;
-  collectionId: string | null;
-  tags: string[];
+  description?: string;
+  categoryId?: string | null;
+  collectionId?: string | null;
+  tags?: string[];
   favorite?: boolean;
 }): Bookmark {
-  const lowest = state.bookmarks.reduce((min, b) => Math.min(min, b.order), 0);
+  const lowest = state.bookmarks.reduce((min, b) => Math.min(min, b.position ?? b.order), 0);
+  const catId = input.categoryId || input.collectionId || null;
   const bookmark: Bookmark = {
     id: uid(),
+    userId: state.user?.id,
     title: input.title,
     url: input.url,
-    collectionId: input.collectionId,
-    tags: input.tags,
+    description: input.description || "",
+    categoryId: catId,
+    collectionId: catId,
+    tags: input.tags || [],
     favorite: input.favorite ?? false,
+    isFavorite: input.favorite ?? false,
     addedAt: Date.now(),
-    // New links join the top of the manual ordering.
     order: lowest - 100,
+    position: lowest - 100,
+    lastOpenedAt: null,
   };
+
   write({ bookmarks: [bookmark, ...state.bookmarks] });
-  persist();
+
+  if (state.authenticated) {
+    fetch("/api/bookmarks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(bookmark),
+    }).catch(() => {});
+  }
+
   return bookmark;
 }
 
@@ -339,59 +503,86 @@ export function updateBookmark(id: string, patch: Partial<Omit<Bookmark, "id">>)
   write({
     bookmarks: state.bookmarks.map((b) => (b.id === id ? { ...b, ...patch } : b)),
   });
-  persist();
+
+  if (state.authenticated) {
+    fetch(`/api/bookmarks/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    }).catch(() => {});
+  }
 }
 
 export function toggleFavorite(id: string) {
   const target = state.bookmarks.find((b) => b.id === id);
   if (!target) return;
-  updateFavorite(id, !target.favorite);
+  const fav = !(target.favorite || target.isFavorite);
+  updateBookmark(id, { favorite: fav, isFavorite: fav });
 }
 
 export function updateFavorite(id: string, favorite: boolean) {
-  write({ bookmarks: state.bookmarks.map((b) => (b.id === id ? { ...b, favorite } : b)) });
-  persist();
+  updateBookmark(id, { favorite, isFavorite: favorite });
 }
 
-/** Undo support for delete: re-insert with the previous order value. */
 export function deleteBookmarks(ids: string[]): Bookmark[] {
   const removed = state.bookmarks.filter((b) => ids.includes(b.id));
   if (!removed.length) return [];
+
   write({ bookmarks: state.bookmarks.filter((b) => !ids.includes(b.id)) });
-  persist();
+
+  if (state.authenticated) {
+    for (const id of ids) {
+      fetch(`/api/bookmarks/${id}`, { method: "DELETE" }).catch(() => {});
+    }
+  }
+
   return removed;
 }
 
 export function restoreBookmarks(removed: Bookmark[]) {
   const existing = new Set(state.bookmarks.map((b) => b.id));
-  write({ bookmarks: [...state.bookmarks, ...removed.filter((b) => !existing.has(b.id))] });
-  persist();
+  const toAdd = removed.filter((b) => !existing.has(b.id));
+  write({ bookmarks: [...state.bookmarks, ...toAdd] });
+
+  if (state.authenticated) {
+    for (const b of toAdd) {
+      fetch("/api/bookmarks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(b),
+      }).catch(() => {});
+    }
+  }
 }
 
-/**
- * Move `draggedId` to `targetIndex` within the visible manual ordering.
- * Uses fractional indices so a single drag rewrites exactly one record.
- */
-/**
- * Move `draggedId` to `targetIndex` inside the visible manual ordering.
- * The visible list is the authoritative order for the current scope, so
- * re-densifying it keeps every view consistent: a collection is a subset,
- * and relative order inside the global list is preserved.
- */
+export function markBookmarkOpened(id: string) {
+  const now = Date.now();
+  write({
+    bookmarks: state.bookmarks.map((b) => (b.id === id ? { ...b, lastOpenedAt: now } : b)),
+  });
+
+  if (state.authenticated) {
+    fetch(`/api/bookmarks/${id}/open`, { method: "POST" }).catch(() => {});
+  }
+}
+
 export function reorder(draggedId: string, visibleIds: string[], targetIndex: number) {
   const next = visibleIds.filter((id) => id !== draggedId);
   next.splice(Math.max(0, Math.min(targetIndex, next.length)), 0, draggedId);
 
   const byId = new Map(state.bookmarks.map((b) => [b.id, b]));
-  const base = next.reduce((min, id) => Math.min(min, byId.get(id)?.order ?? 0), 0);
+  const base = next.reduce((min, id) => Math.min(min, byId.get(id)?.position ?? byId.get(id)?.order ?? 0), 0);
   const orders = new Map(next.map((id, index) => [id, base + index]));
 
   write({
     bookmarks: state.bookmarks.map((b) =>
-      orders.has(b.id) ? { ...b, order: orders.get(b.id) as number } : b,
+      orders.has(b.id)
+        ? { ...b, order: orders.get(b.id) as number, position: orders.get(b.id) as number }
+        : b
     ),
   });
-  persist();
+
+  syncToCloud();
 }
 
 export function moveWithinVisible(id: string, direction: -1 | 1) {
@@ -403,41 +594,81 @@ export function moveWithinVisible(id: string, direction: -1 | 1) {
   reorder(id, ids, target);
 }
 
-export function assignToCollection(id: string, collectionId: string | null) {
-  updateBookmark(id, { collectionId });
+export function assignToCategory(id: string, categoryId: string | null) {
+  updateBookmark(id, { categoryId, collectionId: categoryId });
 }
+export const assignToCollection = assignToCategory;
 
-export function addCollection(name: string, icon = "folder"): Collection {
-  const collection: Collection = { id: uid("c"), name: name.trim() || "Untitled", icon };
-  write({ collections: [...state.collections, collection] });
-  persist();
-  return collection;
+export function addCategory(name: string, icon = "folder", color = "#0a7aff"): Category {
+  const category: Category = {
+    id: uid("c"),
+    userId: state.user?.id,
+    name: name.trim() || "Untitled",
+    icon,
+    color,
+    position: state.categories.length * 10,
+  };
+
+  const nextCategories = [...state.categories, category];
+  write({ categories: nextCategories, collections: nextCategories });
+
+  if (state.authenticated) {
+    fetch("/api/categories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(category),
+    }).catch(() => {});
+  }
+
+  return category;
 }
+export const addCollection = addCategory;
 
-export function updateCollection(id: string, patch: Partial<Omit<Collection, "id">>) {
+export function updateCategory(id: string, patch: Partial<Omit<Category, "id">>) {
+  const nextCategories = state.categories.map((c) =>
+    c.id === id ? { ...c, ...patch, name: patch.name !== undefined ? patch.name.trim() || c.name : c.name } : c
+  );
+  write({ categories: nextCategories, collections: nextCategories });
+
+  if (state.authenticated) {
+    fetch(`/api/categories/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    }).catch(() => {});
+  }
+}
+export const updateCollection = updateCategory;
+
+export function renameCategory(id: string, name: string) {
+  updateCategory(id, { name });
+}
+export const renameCollection = renameCategory;
+
+export function deleteCategory(id: string) {
+  const scopeGone =
+    (state.scope.kind === "category" || state.scope.kind === "collection") && state.scope.id === id;
+
+  const nextCategories = state.categories.filter((c) => c.id !== id);
+  // As per Section 15: move bookmarks inside to Uncategorized (null)
+  const nextBookmarks = state.bookmarks.map((b) =>
+    (b.categoryId === id || b.collectionId === id) ? { ...b, categoryId: null, collectionId: null } : b
+  );
+
   write({
-    collections: state.collections.map((c) =>
-      c.id === id
-        ? { ...c, ...patch, name: patch.name !== undefined ? patch.name.trim() || c.name : c.name }
-        : c,
-    ),
+    categories: nextCategories,
+    collections: nextCategories,
+    bookmarks: nextBookmarks,
+    scope: scopeGone ? { kind: "overview" } : state.scope,
   });
-  persist();
+
+  if (state.authenticated) {
+    fetch(`/api/categories/${id}`, { method: "DELETE" }).catch(() => {});
+  }
+}
+export function resetLibrary() {
+  write({ bookmarks: [], scope: { kind: "overview" }, query: "" });
+  syncToCloud();
 }
 
-export function renameCollection(id: string, name: string) {
-  write({
-    collections: state.collections.map((c) => (c.id === id ? { ...c, name: name.trim() || c.name } : c)),
-  });
-  persist();
-}
-
-export function deleteCollection(id: string) {
-  const scopeGone = state.scope.kind === "collection" && state.scope.id === id;
-  write({
-    collections: state.collections.filter((c) => c.id !== id),
-    bookmarks: state.bookmarks.map((b) => (b.collectionId === id ? { ...b, collectionId: null } : b)),
-    scope: scopeGone ? { kind: "all" } : state.scope,
-  });
-  persist();
-}
+export const deleteCollection = deleteCategory;

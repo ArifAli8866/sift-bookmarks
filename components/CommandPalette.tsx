@@ -175,8 +175,10 @@ export function CommandPalette({
     }
 
     const actions: { id: string; label: string; icon: IconName; kbd: string; run: () => void }[] = [
+      { id: "a-overview", label: "Dashboard overview", icon: "sparkle", kbd: "⌘0", run: () => onScope({ kind: "overview" }) },
+      { id: "a-all", label: "Show all bookmarks", icon: "bookmark", kbd: "⌘1", run: () => onScope({ kind: "all" }) },
       { id: "a-new", label: "New bookmark", icon: "plus", kbd: "⌘N", run: onNewBookmark },
-      { id: "a-collection", label: "New collection", icon: "folder", kbd: "", run: onNewCollection },
+      { id: "a-collection", label: "Create category", icon: "folder", kbd: "", run: onNewCollection },
       { id: "a-fav", label: "Show favourites", icon: "star", kbd: "⌘2", run: () => onScope({ kind: "favorites" }) },
       { id: "a-recent", label: "Show recent", icon: "clock", kbd: "⌘3", run: () => onScope({ kind: "recent" }) },
       {
@@ -187,18 +189,6 @@ export function CommandPalette({
         run: () => setPrefs({ viewMode: lib.prefs.viewMode === "grid" ? "list" : "grid" }),
       },
       { id: "a-theme", label: "Change appearance", icon: "auto", kbd: "", run: onCycleTheme },
-      {
-        id: "a-sync",
-        label: "Sync with Neon PostgreSQL",
-        icon: "sparkle",
-        kbd: "",
-        run: async () => {
-          pushToast("Syncing with Neon database…");
-          const ok = await syncToCloud();
-          if (ok) pushToast("Synced with Neon PostgreSQL");
-          else pushToast("Database not configured (local storage active)");
-        },
-      },
       { id: "a-keys", label: "Keyboard shortcuts", icon: "keyboard", kbd: "?", run: onShowShortcuts },
     ];
 

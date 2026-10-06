@@ -37,6 +37,7 @@ export function BookmarkDialog({
   onSubmit: (values: {
     title: string;
     url: string;
+    description?: string;
     collectionId: string | null;
     tags: string[];
     favorite: boolean;
@@ -44,6 +45,7 @@ export function BookmarkDialog({
 }) {
   const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [tagDraft, setTagDraft] = useState("");
   const [collectionId, setCollectionId] = useState<string | null>(null);
@@ -58,10 +60,11 @@ export function BookmarkDialog({
     if (!open) return;
     setUrl(bookmark?.url ?? "");
     setTitle(bookmark?.title ?? "");
+    setDescription(bookmark?.description ?? "");
     setTags(bookmark?.tags ?? []);
     setTagDraft("");
     setFavorite(bookmark?.favorite ?? false);
-    setCollectionId(bookmark ? bookmark.collectionId : defaultCollectionId);
+    setCollectionId(bookmark ? (bookmark.collectionId ?? null) : defaultCollectionId);
     setStatus(bookmark ? "ready" : "idle");
     touchedTitle.current = Boolean(bookmark?.title);
   }, [open, bookmark, defaultCollectionId]);
@@ -127,6 +130,7 @@ export function BookmarkDialog({
     onSubmit({
       title: title.trim() || deriveTitle(normalized),
       url: normalized,
+      description: description.trim(),
       collectionId,
       tags,
       favorite,
@@ -220,6 +224,19 @@ export function BookmarkDialog({
                 touchedTitle.current = true;
                 setTitle(e.target.value);
               }}
+            />
+          </span>
+        </label>
+
+        <label className="field">
+          <span className="field-label">Description (optional)</span>
+          <span className="input">
+            <input
+              name="description"
+              type="text"
+              value={description}
+              placeholder="Brief note or description"
+              onChange={(e) => setDescription(e.target.value)}
             />
           </span>
         </label>

@@ -1,23 +1,29 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Icon } from "./Icon";
+import { Icon, type IconName } from "./Icon";
 import { Menu, type MenuEntry } from "./Menu";
-import { countFor, setPrefs, tagCounts, type Collection, type LibraryState, type Scope } from "../lib/store";
-import type { IconName } from "./Icon";
+import {
+  countFor,
+  setPrefs,
+  tagCounts,
+  type Category,
+  type LibraryState,
+  type Scope,
+} from "../lib/store";
 
 const FALLBACK_ICON: IconName = "folder";
-function collectionIcon(collection: Collection): IconName {
-  return (collection.icon as IconName) ?? FALLBACK_ICON;
+function categoryIcon(category: Category): IconName {
+  return (category.icon as IconName) ?? FALLBACK_ICON;
 }
 
-const NAV: { kind: Scope["kind"]; label: string; icon: Parameters<typeof Icon>[0]["name"] }[] = [
-  { kind: "all", label: "All items", icon: "inbox" },
+const NAV: { kind: Scope["kind"]; label: string; icon: IconName }[] = [
+  { kind: "overview", label: "Overview", icon: "sparkle" },
+  { kind: "all", label: "All Bookmarks", icon: "bookmark" },
   { kind: "favorites", label: "Favourites", icon: "star" },
   { kind: "recent", label: "Recent", icon: "clock" },
 ];
 
-/** The sidebar's own loading shape: counts and rows that do not lie. */
 function NavSk({ w }: { w: number }) {
   return (
     <span
@@ -31,69 +37,86 @@ function NavSk({ w }: { w: number }) {
 export function Sidebar({
   lib,
   onNewBookmark,
-  onNewCollection,
-  onRenameCollection,
-  onDeleteCollection,
+  onNewCategory,
+  onEditCategory,
+  onDeleteCategory,
+  onOpenSettings,
   onShowShortcuts,
-  onRestoreSamples,
+  onLogout,
   onScope,
 }: {
   lib: LibraryState;
-  onNewBookmark: (collectionId: string | null) => void;
-  onNewCollection: () => void;
-  onRenameCollection: (collection: Collection) => void;
-  onDeleteCollection: (collection: Collection) => void;
+  onNewBookmark: (categoryId: string | null) => void;
+  onNewCategory: () => void;
+  onEditCategory: (category: Category) => void;
+  onDeleteCategory: (category: Category) => void;
+  onOpenSettings: () => void;
   onShowShortcuts: () => void;
-  onRestoreSamples: () => void;
+  onLogout: () => void;
   onScope: (scope: Scope) => void;
 }) {
   const [menuFor, setMenuFor] = useState<{ anchor: HTMLElement; id: string } | null>(null);
-  const [navMenu, setNavMenu] = useState<HTMLElement | null>(null);
+  const [userMenu, setUserMenu] = useState<HTMLElement | null>(null);
   const [themeMenu, setThemeMenu] = useState<HTMLElement | null>(null);
   const [tagsOpen, setTagsOpen] = useState(false);
 
   const tags = useMemo(() => tagCounts(lib), [lib]);
   const shownTags = tagsOpen ? tags : tags.slice(0, 5);
+
   const isCurrent = (scope: Scope) =>
     scope.kind === lib.scope.kind && (scope.id ?? undefined) === (lib.scope.id ?? undefined);
 
-  const collectionEntries = (collection: Collection): MenuEntry[] => [
+  const categoryEntries = (category: Category): MenuEntry[] => [
     {
       id: "add",
       label: "New bookmark here",
       icon: "plus",
-      onSelect: () => onNewBookmark(collection.id),
+      onSelect: () => onNewBookmark(category.id),
     },
     { id: "sep", label: "" },
     {
-      id: "rename",
-      label: "Rename…",
+      id: "edit",
+      label: "Edit category…",
       icon: "pencil",
-      onSelect: () => onRenameCollection(collection),
+      onSelect: () => onEditCategory(category),
     },
     {
       id: "delete",
-      label: "Delete collection…",
+      label: "Delete category…",
       icon: "trash",
       danger: true,
-      onSelect: () => onDeleteCollection(collection),
+      onSelect: () => onDeleteCategory(category),
     },
   ];
+
+  const userInitial = (lib.user?.name || "D")[0]?.toUpperCase() || "D";
 
   return (
     <aside className="sidebar" aria-label="Library">
       <div className="sidebar-inner">
+        {/* Brand */}
         <div className="brand">
           <span className="brand-mark" aria-hidden="true">
             <Icon name="bookmark" size={13} />
           </span>
           <span className="brand-name">Sift</span>
+          <span className="spacer" />
+          <button
+            type="button"
+            className="icon-btn"
+            aria-label="New bookmark"
+            title="New bookmark (⌘N)"
+            onClick={() => onNewBookmark(null)}
+          >
+            <Icon name="plus" size={13} />
+          </button>
         </div>
 
         <div className="sidebar-scroll scroll">
+          {/* Main Navigation */}
           <nav className="nav-section">
             <div className="nav-head">
-              <span className="nav-head-label">Library</span>
+              <span className="nav-head-label">Workspace</span>
             </div>
             {NAV.map((item) => {
               const count = countFor(lib, { kind: item.kind });
@@ -104,45 +127,29 @@ export function Sidebar({
                   className="nav-row"
                   aria-current={isCurrent({ kind: item.kind }) ? "page" : undefined}
                   onClick={() => onScope({ kind: item.kind })}
-                  onContextMenu={(e) => {
-                    if (item.kind !== "all") return;
-                    e.preventDefault();
-                    setNavMenu(e.currentTarget);
-                  }}
                 >
                   <Icon name={item.icon} size={15} className="nav-icon" />
                   <span className="nav-label truncate">{item.label}</span>
-                  {item.kind === "all" ? (
-                    <span
-                      className="nav-more"
-                      role="button"
-                      tabIndex={-1}
-                      aria-hidden="true"
-                      onPointerDown={(e) => {
-                        e.stopPropagation();
-                        setNavMenu(e.currentTarget);
-                      }}
-                    >
-                      <Icon name="ellipsis" size={12} />
+                  {item.kind !== "overview" ? (
+                    <span className="nav-count t-num">
+                      {lib.hydrated ? count : <NavSk w={14} />}
                     </span>
                   ) : null}
-                  <span className="nav-count t-num">
-                    {lib.hydrated ? count : <NavSk w={14} />}
-                  </span>
                 </button>
               );
             })}
           </nav>
 
+          {/* User Categories */}
           <nav className="nav-section">
             <div className="nav-head">
-              <span className="nav-head-label">Collections</span>
+              <span className="nav-head-label">Your Categories</span>
               <button
                 type="button"
                 className="icon-btn"
-                aria-label="New collection"
-                title="New collection"
-                onClick={onNewCollection}
+                aria-label="Create category"
+                title="Create category"
+                onClick={onNewCategory}
               >
                 <Icon name="plus" size={13} />
               </button>
@@ -160,27 +167,36 @@ export function Sidebar({
                   </div>
                 ))}
               </>
-            ) : lib.collections.length === 0 ? (
-              <button type="button" className="nav-row is-empty-state" onClick={onNewCollection}>
-                <span className="nav-label">No collections</span>
+            ) : lib.categories.length === 0 ? (
+              <button
+                type="button"
+                className="nav-row is-empty-state"
+                onClick={onNewCategory}
+              >
+                <span className="nav-label">+ Add your first category</span>
               </button>
             ) : (
-              lib.collections.map((collection) => {
-                const count = countFor(lib, { kind: "collection", id: collection.id });
+              lib.categories.map((category) => {
+                const count = countFor(lib, { kind: "category", id: category.id });
+                const active = isCurrent({ kind: "category", id: category.id });
                 return (
                   <button
-                    key={collection.id}
+                    key={category.id}
                     type="button"
                     className="nav-row"
-                    aria-current={isCurrent({ kind: "collection", id: collection.id }) ? "page" : undefined}
-                    onClick={() => onScope({ kind: "collection", id: collection.id })}
+                    aria-current={active ? "page" : undefined}
+                    onClick={() => onScope({ kind: "category", id: category.id })}
                     onContextMenu={(e) => {
                       e.preventDefault();
-                      setMenuFor({ anchor: e.currentTarget, id: collection.id });
+                      setMenuFor({ anchor: e.currentTarget, id: category.id });
                     }}
                   >
-                    <Icon name={collectionIcon(collection)} size={15} className="nav-icon" />
-                    <span className="nav-label truncate">{collection.name}</span>
+                    <span
+                      className="nav-cat-dot"
+                      style={{ backgroundColor: category.color || "var(--accent)" }}
+                    />
+                    <Icon name={categoryIcon(category)} size={15} className="nav-icon" />
+                    <span className="nav-label truncate">{category.name}</span>
                     <span
                       className="nav-more"
                       role="button"
@@ -188,7 +204,7 @@ export function Sidebar({
                       aria-hidden="true"
                       onPointerDown={(e) => {
                         e.stopPropagation();
-                        setMenuFor({ anchor: e.currentTarget, id: collection.id });
+                        setMenuFor({ anchor: e.currentTarget, id: category.id });
                       }}
                     >
                       <Icon name="ellipsis" size={12} />
@@ -200,6 +216,7 @@ export function Sidebar({
             )}
           </nav>
 
+          {/* Tags */}
           {shownTags.length ? (
             <nav className="nav-section">
               <div className="nav-head">
@@ -214,7 +231,7 @@ export function Sidebar({
                   onClick={() => onScope({ kind: "tag", id: tag })}
                 >
                   <Icon name="tag" size={14} className="nav-icon" />
-                  <span className="nav-label truncate">{tag}</span>
+                  <span className="nav-label truncate">#{tag}</span>
                   <span className="nav-count t-num">{count}</span>
                 </button>
               ))}
@@ -225,69 +242,131 @@ export function Sidebar({
                   onClick={() => setTagsOpen((v) => !v)}
                 >
                   <Icon name={tagsOpen ? "chevronUp" : "chevronDown"} size={13} className="nav-icon" />
-                  <span className="nav-label">{tagsOpen ? "Show less" : `Show all (${tags.length})`}</span>
+                  <span className="nav-label">
+                    {tagsOpen ? "Show less" : `Show all (${tags.length})`}
+                  </span>
                 </button>
               ) : null}
             </nav>
           ) : null}
         </div>
 
+        {/* Footer: User profile & quick toggles */}
         <div className="sidebar-foot">
           <button
             type="button"
-            className="icon-btn"
-            aria-label={`Appearance: ${lib.prefs.theme}`}
-            title="Appearance"
-            onClick={(e) => setThemeMenu(e.currentTarget)}
+            className="sidebar-user-pill"
+            aria-label="User profile & settings"
+            title="User profile & settings"
+            onClick={(e) => setUserMenu(e.currentTarget)}
           >
-            <Icon name={lib.prefs.theme === "light" ? "sun" : lib.prefs.theme === "dark" ? "moon" : "auto"} size={15} />
+            <div className="sidebar-avatar">
+              {lib.user?.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={lib.user.image} alt={lib.user.name} />
+              ) : (
+                <span>{userInitial}</span>
+              )}
+            </div>
+            <div className="sidebar-user-details truncate">
+              <span className="sidebar-user-name truncate">
+                {lib.user?.name || "Developer"}
+              </span>
+              <span className="sidebar-user-sub truncate">
+                {lib.user?.email || "Workspace"}
+              </span>
+            </div>
+            <Icon name="chevronUp" size={12} className="sidebar-user-arrow" />
           </button>
-          <button type="button" className="icon-btn" aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)" onClick={onShowShortcuts}>
-            <Icon name="keyboard" size={16} />
-          </button>
-          <span className="spacer" />
-          <span
-            className="brand-count sync-badge"
-            title={
-              lib.syncStatus === "synced"
-                ? "Connected to Neon PostgreSQL"
-                : lib.syncStatus === "syncing"
-                ? "Syncing to Neon PostgreSQL..."
-                : lib.syncStatus === "error"
-                ? "Sync error — local storage active"
-                : "Local storage mode (configure DATABASE_URL for Neon)"
-            }
-          >
-            <span className={`sync-indicator sync-${lib.syncStatus}`} aria-hidden="true" />
-            {lib.syncStatus === "synced" ? "Neon DB" : lib.syncStatus === "syncing" ? "Syncing…" : "Local"}
-          </span>
         </div>
       </div>
 
+      {/* Category Actions Context Menu */}
       <Menu
         open={!!menuFor}
         anchor={menuFor?.anchor ?? null}
-        entries={collectionEntries(lib.collections.find((c) => c.id === menuFor?.id) ?? ({ id: "", name: "", icon: "" } as Collection))}
+        entries={categoryEntries(
+          lib.categories.find((c) => c.id === menuFor?.id) ??
+            ({ id: "", name: "", icon: "folder" } as Category)
+        )}
         onClose={() => setMenuFor(null)}
       />
+
+      {/* User Profile Context Menu */}
       <Menu
-        open={!!navMenu}
-        anchor={navMenu}
+        open={!!userMenu}
+        anchor={userMenu}
         align="start"
+        width={210}
         entries={[
-          { id: "new", label: "New bookmark", icon: "plus", kbd: "⌘N", onSelect: () => onNewBookmark(null) },
-          { id: "sep", label: "" },
-          { id: "restore", label: "Restore sample library", icon: "sparkle", onSelect: onRestoreSamples },
+          {
+            id: "profile-name",
+            label: lib.user?.name || "Developer",
+            icon: "user",
+            disabled: true,
+          },
+          { id: "sep1", label: "" },
+          {
+            id: "settings",
+            label: "Settings…",
+            icon: "settings",
+            onSelect: onOpenSettings,
+          },
+          {
+            id: "theme",
+            label: `Theme: ${lib.prefs.theme}`,
+            icon: lib.prefs.theme === "light" ? "sun" : lib.prefs.theme === "dark" ? "moon" : "auto",
+            onSelect: () => {
+              const current = lib.prefs.theme;
+              const next = current === "light" ? "dark" : current === "dark" ? "system" : "light";
+              setPrefs({ theme: next });
+            },
+          },
+          {
+            id: "shortcuts",
+            label: "Keyboard shortcuts",
+            icon: "keyboard",
+            kbd: "?",
+            onSelect: onShowShortcuts,
+          },
+          { id: "sep2", label: "" },
+          {
+            id: "logout",
+            label: "Sign out",
+            icon: "logout",
+            danger: true,
+            onSelect: onLogout,
+          },
         ]}
-        onClose={() => setNavMenu(null)}
+        onClose={() => setUserMenu(null)}
       />
+
+      {/* Theme Menu */}
       <Menu
         open={!!themeMenu}
         anchor={themeMenu}
         entries={[
-          { id: "system", label: "Follow system", icon: "auto", checked: lib.prefs.theme === "system", onSelect: () => setPrefs({ theme: "system" }) },
-          { id: "light", label: "Light", icon: "sun", checked: lib.prefs.theme === "light", onSelect: () => setPrefs({ theme: "light" }) },
-          { id: "dark", label: "Dark", icon: "moon", checked: lib.prefs.theme === "dark", onSelect: () => setPrefs({ theme: "dark" }) },
+          {
+            id: "system",
+            label: "Follow system",
+            icon: "auto",
+            checked: lib.prefs.theme === "system",
+            onSelect: () => setPrefs({ theme: "system" }),
+          },
+          {
+            id: "light",
+            label: "Light",
+            icon: "sun",
+            checked: lib.prefs.theme === "light",
+            onSelect: () => setPrefs({ theme: "light" }),
+          },
+          {
+            id: "dark",
+            label: "Dark",
+            icon: "moon",
+            checked: lib.prefs.theme === "dark",
+            onSelect: () => setPrefs({ theme: "dark" }),
+          },
         ]}
         onClose={() => setThemeMenu(null)}
       />
