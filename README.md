@@ -194,9 +194,7 @@ URL
 Description
    ↓
 Category
-```
-
----
+`
 
 # ⌘ COMMAND PALETTE
 
@@ -234,30 +232,23 @@ Search your entire library without leaving the keyboard.
 # ✦ YOUR DATA. YOUR LIBRARY.
 
 Sift is built around **personal workspaces**.
-
-``mermaid
+mermaid
 flowchart TB
-
     USER["👤 User"]
-
     USER --> AUTH["🔐 Authentication"]
-
     AUTH --> WORKSPACE["✦ Personal Workspace"]
-
     WORKSPACE --> BOOKMARKS["🔖 Bookmarks"]
     WORKSPACE --> CATEGORIES["🗂 Categories"]
     WORKSPACE --> FAVORITES["⭐ Favorites"]
     WORKSPACE --> RECENT["🕐 Recent"]
-
     BOOKMARKS --> DB[("PostgreSQL")]
     CATEGORIES --> DB
     FAVORITES --> DB
     RECENT --> DB
-```
 
 Every account gets its own data.
 
-```text
+`text
 User A
  ├── GitHub
  ├── React
@@ -269,15 +260,14 @@ User B
  ├── Figma
  ├── Claude
  └── Supabase
-```
-
+`
 ---
 
 # 🔐 PRIVATE BY DESIGN
 
 Authentication:
 
-```text
+``text
 ┌─────────────────────┐
 │       SIFT          │
 │                     │
@@ -298,7 +288,7 @@ Authentication:
 │  [ Continue Google ]│
 │                     │
 └─────────────────────┘
-```
+`
 
 Your bookmarks belong to **your account**.
 
@@ -310,23 +300,19 @@ New users don't start with a library full of fake bookmarks.
 
 Instead:
 
-```text
+`text
               YOUR EMPTY LIBRARY
-
-       "Build your developer toolbox"
-
-              Popular suggestions
-
+        "Build your developer toolbox"
+            Popular suggestions
        ┌────────┐ ┌────────┐ ┌────────┐
        │ GitHub │ │  MDN   │ │ React  │
        │  + Add │ │  + Add │ │  + Add │
        └────────┘ └────────┘ └────────┘
-
        ┌────────┐ ┌────────┐ ┌────────┐
        │ Vercel │ │  Neon  │ │ npm    │
        │  + Add │ │  + Add │ │  + Add │
        └────────┘ └────────┘ └────────┘
-```
+
 
 Nothing is added automatically.
 
@@ -336,7 +322,7 @@ Nothing is added automatically.
 
 # 📊 YOUR WORKSPACE AT A GLANCE
 
-```text
+``text
 ╭──────────────────╮  ╭──────────────────╮
 │                  │  │                  │
 │       42         │  │       12         │
@@ -352,29 +338,20 @@ Nothing is added automatically.
 │    Categories    │  │     Recent      │
 │                  │  │                  │
 ╰──────────────────╯  ╰──────────────────╯
-```
-
+``
 ---
 
 # 🧱 ARCHITECTURE
-
-```mermaid
+`mermaid
 flowchart LR
-
     UI["Next.js + React"]
-
     UI --> AUTH["Authentication"]
-
     UI --> ACTIONS["Server Actions"]
-
     ACTIONS --> ORM["Drizzle ORM"]
-
     ORM --> DB[("Neon PostgreSQL")]
-
     UI --> MOTION["Motion"]
-
     UI --> UIKIT["Tailwind + UI Components"]
-```
+``
 
 ---
 
@@ -409,22 +386,19 @@ flowchart LR
 
 # 🗃️ DATA MODEL
 
-```mermaid
+``mermaid
 erDiagram
-
     USER ||--o{ BOOKMARK : owns
     USER ||--o{ CATEGORY : creates
     USER ||--|| USER_SETTINGS : has
     BOOKMARK }o--|| CATEGORY : belongs_to
     BOOKMARK ||--o{ RECENTLY_USED : appears_in
-
     USER {
         string id
         string email
         string name
         string image
     }
-
     CATEGORY {
         string id
         string user_id
@@ -432,7 +406,6 @@ erDiagram
         string icon
         string color
     }
-
     BOOKMARK {
         string id
         string user_id
@@ -443,26 +416,22 @@ erDiagram
         boolean is_favorite
         datetime last_opened_at
     }
-
     RECENTLY_USED {
         string id
         string bookmark_id
         datetime opened_at
     }
-
     USER_SETTINGS {
         string id
         string user_id
         string theme
         boolean sidebar_collapsed
     }
-```
-
----
+`
 
 # ⚙️ QUICK START
 
-```bash
+``bash
 git clone https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
 
 cd YOUR_REPOSITORY
@@ -470,21 +439,18 @@ cd YOUR_REPOSITORY
 npm install
 
 npm run dev
-```
-
+``
 Open:
 
-```text
+``text
 http://localhost:3000
-```
-
----
+`
 
 # 🔑 ENVIRONMENT
 
 Create `.env.local`:
 
-```env
+``env
 DATABASE_URL="your-neon-database-url"
 
 AUTH_SECRET="your-auth-secret"
@@ -494,13 +460,10 @@ GOOGLE_CLIENT_ID="your-google-client-id"
 GOOGLE_CLIENT_SECRET="your-google-client-secret"
 
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
-```
-
----
-
+``
 # 🧭 ROADMAP
 
-```text
+``text
                     SIFT
                       │
         ┌─────────────┼─────────────┐
