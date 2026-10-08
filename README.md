@@ -50,13 +50,12 @@ A beautiful workspace for all the websites, tools, documentation and resources y
 
 <br />
 
-```text
+`text
 GitHub    MDN    React    Next.js    npm
 Vercel    Neon   Supabase    Prisma
 ChatGPT   Claude  Postman    Figma
 Regex101  Docker  Railway    ...
-```
-
+``
 ### Sift brings them together.
 
 </div>
@@ -65,7 +64,7 @@ Regex101  Docker  Railway    ...
 
 ## ⚡ ONE PLACE. EVERYTHING YOU NEED.
 
-```mermaid
+``mermaid
 mindmap
   root((SIFT))
     Development
@@ -97,8 +96,7 @@ mindmap
       Figma
       Dribbble
       Unsplash
-```
-
+``
 ---
 
 # ✦ BUILT FOR YOUR WORKFLOW
@@ -124,7 +122,7 @@ Save the websites you actually use.
 
 </div>
 
-```text
+``text
 ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
 │ ◉                │  │ ◉                │  │ ◉                │
 │                  │  │                  │  │                  │
@@ -133,9 +131,7 @@ Save the websites you actually use.
 │                  │  │                  │  │                  │
 │ Development  ☆   │  │ Development  ☆   │  │ Development  ★   │
 └──────────────────┘  └──────────────────┘  └──────────────────┘
-```
-
----
+`
 
 # ✦ ORGANIZE YOUR WAY
 
@@ -190,7 +186,7 @@ Organize your library exactly how you work.
 
 Search across:
 
-```text
+``text
 Title
    ↓
 URL
