@@ -141,7 +141,7 @@ Save the websites you actually use.
 
 Create categories that match **your** workflow.
 
-```mermaid
+mermaid
 flowchart LR
     A[Your Library] --> B[Development]
     A --> C[AI]
@@ -149,20 +149,16 @@ flowchart LR
     A --> E[Design]
     A --> F[Deployment]
     A --> G[Tools]
-
     B --> B1[GitHub]
     B --> B2[React]
     B --> B3[Next.js]
-
     C --> C1[ChatGPT]
     C --> C2[Claude]
-
     D --> D1[Neon]
     D --> D2[Supabase]
-
     E --> E1[Figma]
     E --> E2[Dribbble]
-```
+``
 
 ### Categories are yours.
 
@@ -180,11 +176,11 @@ Organize your library exactly how you work.
 
 <div align="center">
 
-```text
+``text
 ┌───────────────────────────────────────────────────────┐
 │  ⌕   Search your library...                    ⌘ K   │
 └───────────────────────────────────────────────────────┘
-```
+`
 
 <br />
 
@@ -214,7 +210,7 @@ Category
 
 </div>
 
-```text
+``text
                  ┌───────────────────────────────┐
                  │ ⌕  Search anything...         │
                  ├───────────────────────────────┤
@@ -229,7 +225,7 @@ Category
                  │     docs.github.com/api       │
                  │                               │
                  └───────────────────────────────┘
-```
+`
 
 Press:
 
@@ -243,7 +239,7 @@ Search your entire library without leaving the keyboard.
 
 Sift is built around **personal workspaces**.
 
-```mermaid
+``mermaid
 flowchart TB
 
     USER["👤 User"]
