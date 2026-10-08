@@ -532,8 +532,7 @@ NEXT_PUBLIC_APP_URL="http://localhost:3000"
 ### Sift Browser Extension
 
 The long-term goal:
-
-```text
+``text
                  ANY WEBSITE
                       │
                       ▼
@@ -550,7 +549,7 @@ The long-term goal:
                       │
                       ▼
              ✦ YOUR SIFT LIBRARY
-```
+`
 
 One click.
 
@@ -564,7 +563,7 @@ Done.
 
 # 📈 PROJECT VISION
 
-```text
+``text
 Bookmarks
      ↓
 Personal Library
@@ -574,7 +573,7 @@ Developer Workspace
 Browser Extension
      ↓
 Your developer command center
-```
+`
 
 Sift isn't trying to replace your browser.
 
