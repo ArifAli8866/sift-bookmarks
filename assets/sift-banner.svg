@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="480" viewBox="0 0 1440 480" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Sift — Your personal developer library</title>
+  <desc id="desc">A dark, violet-gradient banner with the Sift name, tagline, and a preview of an organized developer-resource library.</desc>
+  <defs>
+    <linearGradient id="bg" x1="84" y1="26" x2="1370" y2="473" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#101326"/>
+      <stop offset="0.54" stop-color="#191632"/>
+      <stop offset="1" stop-color="#102439"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="1010" y1="10" x2="1290" y2="437" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8B5CF6" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#22D3EE" stop-opacity=".06"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#C4B5FD"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#67E8F9"/>
+      <stop offset="1" stop-color="#818CF8"/>
+    </linearGradient>
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="42"/>
+    </filter>
+    <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse">
+      <circle cx="1.5" cy="1.5" r="1.1" fill="#A5B4FC" fill-opacity=".16"/>
+    </pattern>
+  </defs>
+  <rect width="1440" height="480" rx="30" fill="url(#bg)"/>
+  <ellipse cx="1171" cy="207" rx="252" ry="207" fill="#7C3AED" fill-opacity=".22" filter="url(#blur)"/>
+  <rect x="730" width="710" height="480" fill="url(#dots)" opacity=".7"/>
+  <circle cx="1298" cy="83" r="3" fill="#C4B5FD"/>
+  <circle cx="1361" cy="139" r="2" fill="#67E8F9"/>
+  <circle cx="1245" cy="409" r="2.5" fill="#C4B5FD"/>
+  <path d="M0 391C260 343 456 469 737 408C1018 347 1179 363 1440 308V480H0V391Z" fill="#080B18" fill-opacity=".37"/>
+  <path d="M75 78h7v7h-7z" rx="2" fill="#C4B5FD"/>
+  <path d="M78.5 74v15M71 81.5h15M73.2 76.2l10.6 10.6m0-10.6L73.2 86.8" stroke="#C4B5FD" stroke-width="1.4" stroke-linecap="round"/>
+  <text x="102" y="91" fill="#C4B5FD" font-family="Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="17" font-weight="700" letter-spacing="5">A CALMER WAY TO BUILD</text>
+  <text x="73" y="229" fill="#FFFFFF" font-family="Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="106" font-weight="800" letter-spacing="-7">SIFT</text>
+  <text x="79" y="282" fill="#E5E7EB" font-family="Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="29" font-weight="500">Your personal developer library.</text>
+  <text x="80" y="326" fill="#A5B4FC" font-family="Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="19" font-weight="500">Save  ·  Organize  ·  Search  ·  Ship</text>
+  <g opacity=".9">
+    <rect x="80" y="365" width="83" height="34" rx="17" fill="#272343" stroke="#5B4B8C"/>
+    <text x="121.5" y="387" text-anchor="middle" fill="#DDD6FE" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12" font-weight="700" letter-spacing="1.2">BOOKMARKS</text>
+    <rect x="173" y="365" width="78" height="34" rx="17" fill="#1C2C3E" stroke="#32516B"/>
+    <text x="212" y="387" text-anchor="middle" fill="#BAE6FD" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12" font-weight="700" letter-spacing="1.2">SEARCH</text>
+    <rect x="261" y="365" width="90" height="34" rx="17" fill="#292343" stroke="#5B4B8C"/>
+    <text x="306" y="387" text-anchor="middle" fill="#DDD6FE" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12" font-weight="700" letter-spacing="1.2">CATEGORIES</text>
+  </g>
+  <g transform="translate(751 75)">
+    <rect x="0" y="0" width="601" height="337" rx="20" fill="#0D1120" fill-opacity=".92" stroke="#FFFFFF" stroke-opacity=".18"/>
+    <path d="M20 0h561a20 20 0 0 1 20 20v33H0V20A20 20 0 0 1 20 0Z" fill="#FFFFFF" fill-opacity=".035"/>
+    <circle cx="24" cy="26" r="5" fill="#FB7185"/>
+    <circle cx="43" cy="26" r="5" fill="#FBBF24"/>
+    <circle cx="62" cy="26" r="5" fill="#34D399"/>
+    <rect x="184" y="14" width="253" height="24" rx="12" fill="#FFFFFF" fill-opacity=".055"/>
+    <text x="310.5" y="30" text-anchor="middle" fill="#858CA6" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11">sift / library</text>
+    <text x="32" y="88" fill="#F8FAFC" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">Your library</text>
+    <text x="32" y="108" fill="#828BA4" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11">A home for your favorite developer resources</text>
+    <rect x="427" y="70" width="143" height="34" rx="10" fill="#7C3AED"/>
+    <text x="498.5" y="91" text-anchor="middle" fill="#FFFFFF" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12" font-weight="700">＋  Add bookmark</text>
+    <rect x="31" y="126" width="539" height="40" rx="10" fill="#171B2D" stroke="#FFFFFF" stroke-opacity=".08"/>
+    <circle cx="50" cy="146" r="6" stroke="#A5B4FC" stroke-width="1.5"/>
+    <path d="m54.5 150.5 4 4" stroke="#A5B4FC" stroke-width="1.5" stroke-linecap="round"/>
+    <text x="68" y="150" fill="#7F879F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12">Search your library...</text>
+    <rect x="32" y="185" width="160" height="116" rx="13" fill="#171B2D" stroke="#FFFFFF" stroke-opacity=".09"/>
+    <rect x="49" y="202" width="34" height="34" rx="10" fill="#29234D"/>
+    <text x="66" y="225" text-anchor="middle" fill="#C4B5FD" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17" font-weight="700">G</text>
+    <text x="49" y="261" fill="#F1F5F9" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="700">GitHub</text>
+    <text x="49" y="281" fill="#838BA1" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="10">Code hosting</text>
+    <rect x="49" y="288" width="72" height="17" rx="8.5" fill="#282342"/>
+    <text x="85" y="300" text-anchor="middle" fill="#C4B5FD" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="8" font-weight="600">Development</text>
+    <rect x="207" y="185" width="160" height="116" rx="13" fill="#171B2D" stroke="#FFFFFF" stroke-opacity=".09"/>
+    <rect x="224" y="202" width="34" height="34" rx="10" fill="#12313C"/>
+    <text x="241" y="225" text-anchor="middle" fill="#67E8F9" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17" font-weight="700">R</text>
+    <text x="224" y="261" fill="#F1F5F9" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="700">React</text>
+    <text x="224" y="281" fill="#838BA1" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="10">UI library docs</text>
+    <rect x="224" y="288" width="72" height="17" rx="8.5" fill="#12313C"/>
+    <text x="260" y="300" text-anchor="middle" fill="#67E8F9" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="8" font-weight="600">Development</text>
+    <rect x="382" y="185" width="160" height="116" rx="13" fill="#171B2D" stroke="#FFFFFF" stroke-opacity=".09"/>
+    <rect x="399" y="202" width="34" height="34" rx="10" fill="#193329"/>
+    <text x="416" y="225" text-anchor="middle" fill="#6EE7B7" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17" font-weight="700">N</text>
+    <text x="399" y="261" fill="#F1F5F9" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="700">Neon</text>
+    <text x="399" y="281" fill="#838BA1" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="10">Serverless Postgres</text>
+    <rect x="399" y="288" width="60" height="17" rx="8.5" fill="#193329"/>
+    <text x="429" y="300" text-anchor="middle" fill="#6EE7B7" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="8" font-weight="600">Database</text>
+  </g>
+  <rect x="716" y="218" width="74" height="74" rx="19" fill="url(#accent)" transform="rotate(-12 716 218)" opacity=".19"/>
+  <path d="M1392 322v26m-13-13h26m-22.2-9.2 18.4 18.4m0-18.4-18.4 18.4" stroke="url(#cyan)" stroke-width="2.6" stroke-linecap="round" opacity=".8"/>
+</svg>

@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Sift library dashboard illustration</title>
+  <desc id="desc">A dark developer-resource library interface with sidebar navigation, search, category filters, bookmark cards, and workspace stats.</desc>
+  <defs>
+    <linearGradient id="page" x1="120" y1="0" x2="1200" y2="760" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#13182A"/>
+      <stop offset="1" stop-color="#101523"/>
+    </linearGradient>
+    <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#A78BFA"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#67E8F9"/>
+      <stop offset="1" stop-color="#38BDF8"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#6EE7B7"/>
+      <stop offset="1" stop-color="#34D399"/>
+    </linearGradient>
+    <linearGradient id="pink" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#FDA4AF"/>
+      <stop offset="1" stop-color="#FB7185"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#030712" flood-opacity=".22"/>
+    </filter>
+  </defs>
+  <rect width="1280" height="760" rx="24" fill="url(#page)"/>
+  <rect x="0.5" y="0.5" width="1279" height="759" rx="23.5" stroke="#FFFFFF" stroke-opacity=".08"/>
+  <rect x="0" y="0" width="254" height="760" rx="24" fill="#0D1120"/>
+  <path d="M254 0v760" stroke="#FFFFFF" stroke-opacity=".08"/>
+  <path d="M43 47h6v6h-6z" fill="#C4B5FD"/>
+  <path d="M46 43v14m-7-7h14m-12-5 10 10m0-10L41 55" stroke="#C4B5FD" stroke-width="1.3" stroke-linecap="round"/>
+  <text x="64" y="56" fill="#F8FAFC" font-family="Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" font-weight="800" letter-spacing="1.8">SIFT</text>
+  <text x="31" y="114" fill="#69738A" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="10" font-weight="700" letter-spacing="1.7">WORKSPACE</text>
+  <rect x="19" y="128" width="216" height="43" rx="11" fill="#211B3D"/>
+  <rect x="19" y="128" width="3" height="43" rx="1.5" fill="#A78BFA"/>
+  <rect x="38" y="143" width="13" height="13" rx="3" stroke="#C4B5FD" stroke-width="1.5"/>
+  <path d="M41 146h7m-7 3h7m-7 3h5" stroke="#C4B5FD" stroke-width="1.1" stroke-linecap="round"/>
+  <text x="63" y="155" fill="#F5F3FF" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600">All bookmarks</text>
+  <text x="206" y="155" text-anchor="end" fill="#A78BFA" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11">24</text>
+  <g fill="#8B93A8" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="13">
+    <path d="M40 191l7-7 7 7-7 7-7-7Z" stroke="#8B93A8" stroke-width="1.3"/>
+    <text x="63" y="196">Favorites</text>
+    <path d="M41 226h12v12H41zM44 223h12v12" stroke="#8B93A8" stroke-width="1.3" stroke-linejoin="round"/>
+    <text x="63" y="235">Recently used</text>
+  </g>
+  <text x="31" y="282" fill="#69738A" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="10" font-weight="700" letter-spacing="1.7">CATEGORIES</text>
+  <g font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12">
+    <rect x="34" y="300" width="9" height="9" rx="3" fill="#A78BFA"/><text x="55" y="309" fill="#B8C0D1">Development</text><text x="211" y="309" text-anchor="end" fill="#69738A" font-size="10">8</text>
+    <rect x="34" y="333" width="9" height="9" rx="3" fill="#67E8F9"/><text x="55" y="342" fill="#B8C0D1">AI</text><text x="211" y="342" text-anchor="end" fill="#69738A" font-size="10">4</text>
+    <rect x="34" y="366" width="9" height="9" rx="3" fill="#6EE7B7"/><text x="55" y="375" fill="#B8C0D1">Database</text><text x="211" y="375" text-anchor="end" fill="#69738A" font-size="10">5</text>
+    <rect x="34" y="399" width="9" height="9" rx="3" fill="#FDA4AF"/><text x="55" y="408" fill="#B8C0D1">Design</text><text x="211" y="408" text-anchor="end" fill="#69738A" font-size="10">3</text>
+    <rect x="34" y="432" width="9" height="9" rx="3" fill="#FBBF24"/><text x="55" y="441" fill="#B8C0D1">Deployment</text><text x="211" y="441" text-anchor="end" fill="#69738A" font-size="10">4</text>
+  </g>
+  <rect x="32" y="480" width="188" height="37" rx="9" fill="#151A2B" stroke="#FFFFFF" stroke-opacity=".08"/>
+  <text x="47" y="504" fill="#C4B5FD" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15">＋</text>
+  <text x="69" y="503" fill="#AAB2C4" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11">New category</text>
+  <rect x="30" y="685" width="34" height="34" rx="17" fill="#302456"/>
+  <text x="47" y="707" text-anchor="middle" fill="#DDD6FE" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12" font-weight="700">JD</text>
+  <text x="76" y="699" fill="#E5E7EB" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11" font-weight="600">Jordan Developer</text>
+  <text x="76" y="713" fill="#69738A" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="9">Personal workspace</text>
+  <text x="294" y="72" fill="#F8FAFC" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="24" font-weight="700">Your library</text>
+  <text x="294" y="98" fill="#8790A6" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12">Your favorite places on the developer web.</text>
+  <rect x="294" y="124" width="615" height="46" rx="12" fill="#171C2E" stroke="#FFFFFF" stroke-opacity=".08"/>
+  <circle cx="318" cy="146" r="6.5" stroke="#8B93A8" stroke-width="1.6"/>
+  <path d="m323 151 4 4" stroke="#8B93A8" stroke-width="1.6" stroke-linecap="round"/>
+  <text x="340" y="150" fill="#737D94" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12">Search titles, URLs, descriptions...</text>
+  <rect x="857" y="135" width="39" height="24" rx="6" fill="#242A3D"/>
+  <text x="876.5" y="151" text-anchor="middle" fill="#A8B1C5" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="10">⌘ K</text>
+  <rect x="1070" y="124" width="169" height="46" rx="12" fill="url(#purple)"/>
+  <text x="1154.5" y="152" text-anchor="middle" fill="#FFFFFF" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12" font-weight="700">＋  Add bookmark</text>
+  <g filter="url(#shadow)">
+    <rect x="294" y="194" width="290" height="100" rx="14" fill="#171C2E" stroke="#FFFFFF" stroke-opacity=".08"/>
+    <rect x="604" y="194" width="290" height="100" rx="14" fill="#171C2E" stroke="#FFFFFF" stroke-opacity=".08"/>
+    <rect x="914" y="194" width="325" height="100" rx="14" fill="#171C2E" stroke="#FFFFFF" stroke-opacity=".08"/>
+  </g>
+  <rect x="312" y="212" width="36" height="36" rx="10" fill="#29234D"/>
+  <text x="330" y="236" text-anchor="middle" fill="#C4B5FD" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17" font-weight="700">✦</text>
+  <text x="361" y="224" fill="#F1F5F9" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12" font-weight="700">Bookmarks</text>
+  <text x="312" y="273" fill="#F8FAFC" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="24" font-weight="700">24</text>
+  <text x="342" y="273" fill="#778198" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="10">saved resources</text>
+  <rect x="622" y="212" width="36" height="36" rx="10" fill="#35251B"/>
+  <text x="640" y="236" text-anchor="middle" fill="#FBBF24" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18">★</text>
+  <text x="671" y="224" fill="#F1F5F9" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12" font-weight="700">Favorites</text>
+  <text x="622" y="273" fill="#F8FAFC" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="24" font-weight="700">8</text>
+  <text x="644" y="273" fill="#778198" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="10">quick picks</text>
+  <rect x="932" y="212" width="36" height="36" rx="10" fill="#18312D"/>
+  <text x="950" y="236" text-anchor="middle" fill="#6EE7B7" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17">◷</text>
+  <text x="981" y="224" fill="#F1F5F9" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12" font-weight="700">Recently used</text>
+  <text x="932" y="273" fill="#F8FAFC" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="24" font-weight="700">6</text>
+  <text x="954" y="273" fill="#778198" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="10">opened this week</text>
+  <text x="294" y="340" fill="#F1F5F9" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="700">All bookmarks</text>
+  <text x="1238" y="340" text-anchor="end" fill="#8B93A8" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11">24 resources</text>
+  <g font-family="Inter, ui-sans-serif, system-ui, sans-serif">
+    <rect x="294" y="360" width="290" height="153" rx="14" fill="#171C2E" stroke="#FFFFFF" stroke-opacity=".09"/>
+    <rect x="314" y="380" width="39" height="39" rx="11" fill="#29234D"/>
+    <text x="333.5" y="406" text-anchor="middle" fill="#C4B5FD" font-size="19" font-weight="700">G</text>
+    <text x="314" y="449" fill="#F8FAFC" font-size="14" font-weight="700">GitHub</text>
+    <text x="314" y="469" fill="#8B93A8" font-size="10">Code hosting and collaboration</text>
+    <rect x="314" y="482" width="85" height="19" rx="9.5" fill="#29234D"/>
+    <text x="356.5" y="495" text-anchor="middle" fill="#C4B5FD" font-size="9" font-weight="600">Development</text>
+    <path d="m553 381 3.3 6.7 7.4 1.1-5.4 5.2 1.3 7.4-6.6-3.5-6.6 3.5 1.3-7.4-5.4-5.2 7.4-1.1 3.3-6.7Z" fill="#FBBF24"/>
+
+    <rect x="604" y="360" width="290" height="153" rx="14" fill="#171C2E" stroke="#FFFFFF" stroke-opacity=".09"/>
+    <rect x="624" y="380" width="39" height="39" rx="11" fill="#12313C"/>
+    <text x="643.5" y="406" text-anchor="middle" fill="#67E8F9" font-size="19" font-weight="700">R</text>
+    <text x="624" y="449" fill="#F8FAFC" font-size="14" font-weight="700">React</text>
+    <text x="624" y="469" fill="#8B93A8" font-size="10">The library for web and native UIs</text>
+    <rect x="624" y="482" width="85" height="19" rx="9.5" fill="#12313C"/>
+    <text x="666.5" y="495" text-anchor="middle" fill="#67E8F9" font-size="9" font-weight="600">Development</text>
+    <path d="m863 381 3.3 6.7 7.4 1.1-5.4 5.2 1.3 7.4-6.6-3.5-6.6 3.5 1.3-7.4-5.4-5.2 7.4-1.1 3.3-6.7Z" fill="#FBBF24"/>
+
+    <rect x="914" y="360" width="325" height="153" rx="14" fill="#171C2E" stroke="#FFFFFF" stroke-opacity=".09"/>
+    <rect x="934" y="380" width="39" height="39" rx="11" fill="#193329"/>
+    <text x="953.5" y="406" text-anchor="middle" fill="#6EE7B7" font-size="19" font-weight="700">N</text>
+    <text x="934" y="449" fill="#F8FAFC" font-size="14" font-weight="700">Neon</text>
+    <text x="934" y="469" fill="#8B93A8" font-size="10">Serverless Postgres platform</text>
+    <rect x="934" y="482" width="64" height="19" rx="9.5" fill="#193329"/>
+    <text x="966" y="495" text-anchor="middle" fill="#6EE7B7" font-size="9" font-weight="600">Database</text>
+    <path d="m1208 381 3.3 6.7 7.4 1.1-5.4 5.2 1.3 7.4-6.6-3.5-6.6 3.5 1.3-7.4-5.4-5.2 7.4-1.1 3.3-6.7Z" fill="#FBBF24"/>
+
+    <rect x="294" y="531" width="290" height="153" rx="14" fill="#171C2E" stroke="#FFFFFF" stroke-opacity=".09"/>
+    <rect x="314" y="551" width="39" height="39" rx="11" fill="#202742"/>
+    <text x="333.5" y="577" text-anchor="middle" fill="#A5B4FC" font-size="19" font-weight="700">N</text>
+    <text x="314" y="620" fill="#F8FAFC" font-size="14" font-weight="700">Next.js</text>
+    <text x="314" y="640" fill="#8B93A8" font-size="10">The React framework for the web</text>
+    <rect x="314" y="653" width="85" height="19" rx="9.5" fill="#29234D"/>
+    <text x="356.5" y="666" text-anchor="middle" fill="#C4B5FD" font-size="9" font-weight="600">Development</text>
+    <path d="m553 552 3.3 6.7 7.4 1.1-5.4 5.2 1.3 7.4-6.6-3.5-6.6 3.5 1.3-7.4-5.4-5.2 7.4-1.1 3.3-6.7Z" fill="#FBBF24"/>
+
+    <rect x="604" y="531" width="290" height="153" rx="14" fill="#171C2E" stroke="#FFFFFF" stroke-opacity=".09"/>
+    <rect x="624" y="551" width="39" height="39" rx="11" fill="#342131"/>
+    <text x="643.5" y="577" text-anchor="middle" fill="#FDA4AF" font-size="19" font-weight="700">F</text>
+    <text x="624" y="620" fill="#F8FAFC" font-size="14" font-weight="700">Figma</text>
+    <text x="624" y="640" fill="#8B93A8" font-size="10">Collaborative interface design</text>
+    <rect x="624" y="653" width="55" height="19" rx="9.5" fill="#342131"/>
+    <text x="651.5" y="666" text-anchor="middle" fill="#FDA4AF" font-size="9" font-weight="600">Design</text>
+    <path d="m863 552 3.3 6.7 7.4 1.1-5.4 5.2 1.3 7.4-6.6-3.5-6.6 3.5 1.3-7.4-5.4-5.2 7.4-1.1 3.3-6.7Z" fill="#FBBF24"/>
+
+    <rect x="914" y="531" width="325" height="153" rx="14" fill="#171C2E" stroke="#FFFFFF" stroke-opacity=".09"/>
+    <rect x="934" y="551" width="39" height="39" rx="11" fill="#382D1B"/>
+    <text x="953.5" y="577" text-anchor="middle" fill="#FCD34D" font-size="19" font-weight="700">V</text>
+    <text x="934" y="620" fill="#F8FAFC" font-size="14" font-weight="700">Vercel</text>
+    <text x="934" y="640" fill="#8B93A8" font-size="10">Deploy web projects with ease</text>
+    <rect x="934" y="653" width="82" height="19" rx="9.5" fill="#382D1B"/>
+    <text x="975" y="666" text-anchor="middle" fill="#FCD34D" font-size="9" font-weight="600">Deployment</text>
+    <path d="m1208 552 3.3 6.7 7.4 1.1-5.4 5.2 1.3 7.4-6.6-3.5-6.6 3.5 1.3-7.4-5.4-5.2 7.4-1.1 3.3-6.7Z" fill="#FBBF24"/>
+  </g>
+</svg>
