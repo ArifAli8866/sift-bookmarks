@@ -60,15 +60,18 @@ export function Toolbar({
         <Icon name="sidebar" size={16} />
       </button>
 
-      <div className="toolbar-title">
-        <h1 className="t-title toolbar-name">
-          <span className="truncate">{title}</span>
-        </h1>
-        {/* The badge counts what is on screen; the denominator only appears
-            when the filter is what hides the rest. */}
-        <span className="count-badge t-num" aria-live="polite">
-          {querying && shown !== total ? `${shown} of ${total}` : shown}
-        </span>
+      <div className="toolbar-title-group">
+        <div className="toolbar-title">
+          <h1 className="t-title toolbar-name">
+            <span className="truncate">{title}</span>
+          </h1>
+          <span className="toolbar-metric-pill t-num" aria-live="polite">
+            {querying && shown !== total ? `${shown} of ${total}` : `${shown} bookmarks`}
+          </span>
+        </div>
+        <div className="toolbar-sub">
+          <span className="truncate">Developer Workspace • Fast Access</span>
+        </div>
       </div>
 
       <div className="toolbar-actions">

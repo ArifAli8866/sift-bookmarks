@@ -580,21 +580,23 @@ img {
 .segmented {
   position: relative;
   display: inline-flex;
-  padding: 2px;
+  align-items: center;
+  padding: 3px;
   gap: 2px;
-  border-radius: 8px;
+  height: 32px;
+  border-radius: 10px;
   background: var(--surface-sunken);
-  box-shadow: inset 0 0 0 0.5px var(--edge), inset 0 0.5px 1px rgba(16, 16, 22, 0.05);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .segmented-thumb {
   position: absolute;
-  top: 2px;
-  left: 2px;
-  height: calc(100% - 4px);
-  border-radius: 6px;
-  background: var(--surface-raised);
-  box-shadow: 0 0.5px 1.5px rgba(16, 16, 22, 0.14), var(--top-highlight);
+  top: 3px;
+  left: 3px;
+  height: calc(100% - 6px);
+  border-radius: 7px;
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
   transition: transform var(--t-fast) var(--ease-out), width var(--t-fast) var(--ease-out);
   will-change: transform;
 }
@@ -605,10 +607,10 @@ img {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 22px;
-  min-width: 26px;
-  padding: 0 6px;
-  border-radius: 6px;
+  height: 26px;
+  min-width: 30px;
+  padding: 0 8px;
+  border-radius: 7px;
   color: var(--text-3);
   transition: color var(--t-tint) var(--ease-out);
 }
