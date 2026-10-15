@@ -43,28 +43,62 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: var(--s2);
+  gap: 10px;
   height: var(--toolbar-h);
-  padding: 0 10px 0 14px;
+  padding: 0 14px 0 16px;
   flex: none;
+  border-bottom: 0.5px solid var(--separator-soft);
 }
 
 .brand-mark {
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  background: var(--accent);
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   color: #fff;
-  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.35), 0 1px 2px rgba(10, 90, 200, 0.3);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.28);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
 }
 
 .brand-name {
-  font-size: var(--fs-base);
-  font-weight: 600;
-  letter-spacing: -0.022em;
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
   color: var(--text);
+}
+
+.brand-sub {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  letter-spacing: -0.01em;
+}
+
+.brand-quick-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--tint);
+  color: var(--text-2);
+  border: 0.5px solid var(--edge);
+  transition: all var(--t-fast) var(--ease-out);
+  cursor: pointer;
+}
+
+.brand-quick-btn:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
 }
 
 .brand-count {
@@ -174,20 +208,21 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: var(--s2);
+  gap: 10px;
   width: 100%;
-  height: 28px;
-  padding: 0 7px;
+  height: 36px;
+  padding: 0 12px;
   border-radius: var(--r-row);
   color: var(--text-2);
   font-size: var(--fs-base);
+  font-weight: 500;
   letter-spacing: -0.011em;
   transition: background-color var(--t-tint) var(--ease-out), color var(--t-tint) var(--ease-out),
-    box-shadow var(--t-micro) var(--ease-out);
+    box-shadow var(--t-micro) var(--ease-out), transform var(--t-micro) var(--ease-out);
 }
 
 .nav-row + .nav-row {
-  margin-top: 1px;
+  margin-top: 3px;
 }
 
 .nav-row:hover {
@@ -197,22 +232,35 @@
 
 .nav-row:active {
   background: var(--tint-press);
+  transform: scale(0.985);
   transition-duration: 40ms;
 }
 
 .nav-row[aria-current="page"] {
-  background: var(--accent);
-  color: var(--accent-on);
-  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.22), 0 0.5px 2px rgba(10, 90, 200, 0.3);
+  background: #18181b;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(24, 24, 27, 0.16);
+}
+
+:root[data-theme="dark"] .nav-row[aria-current="page"] {
+  background: #27272a;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
 }
 
 .nav-row[aria-current="page"]:hover {
-  background: var(--accent-hover);
-  color: var(--accent-on);
+  background: #27272a;
+  color: #ffffff;
+}
+
+:root[data-theme="dark"] .nav-row[aria-current="page"]:hover {
+  background: #3f3f46;
 }
 
 .nav-row[aria-current="page"] .nav-count {
-  color: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
 }
 
 .nav-icon {
@@ -225,7 +273,7 @@
 }
 
 .nav-row[aria-current="page"] .nav-icon {
-  color: rgba(255, 255, 255, 0.9);
+  color: #ffffff;
 }
 
 .nav-label {

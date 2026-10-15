@@ -97,13 +97,16 @@ export function Sidebar({
         {/* Brand */}
         <div className="brand">
           <span className="brand-mark" aria-hidden="true">
-            <Icon name="bookmark" size={13} />
+            <Icon name="bookmark" size={15} />
           </span>
-          <span className="brand-name">Sift</span>
+          <div className="brand-text">
+            <span className="brand-name">Sift</span>
+            <span className="brand-sub">Bookmarks</span>
+          </div>
           <span className="spacer" />
           <button
             type="button"
-            className="icon-btn"
+            className="brand-quick-btn"
             aria-label="New bookmark"
             title="New bookmark (⌘N)"
             onClick={() => onNewBookmark(null)}
