@@ -270,41 +270,204 @@ export function DashboardOverview({
         </div>
       </section>
 
-      {/* 3.5 SaaS Activity Analytics Bar Chart (inspired by ref4/ref5) */}
+      {/* 3.5 SaaS Activity Analytics & Insights (inspired by ref4/ref5) */}
       <section className="dashboard-analytics-section" aria-label="Usage analytics">
-        <div className="activity-card">
-          <div className="activity-card-header">
-            <div>
-              <div className="activity-card-title-row">
-                <h3 className="activity-card-title">Weekly Activity</h3>
-                <span className="activity-count-pill">{recentCount} this week</span>
+        <div className="dashboard-analytics-layout">
+          {/* Left Column: Weekly Activity Bar Chart */}
+          <div className="activity-card">
+            <div className="activity-card-header">
+              <div>
+                <div className="activity-card-title-row">
+                  <h3 className="activity-card-title">Weekly Activity</h3>
+                  <span className="activity-count-pill">{recentCount} this week</span>
+                </div>
+                <p className="activity-card-subtitle">
+                  Link visits and interactions across the past 7 days
+                </p>
               </div>
-              <p className="activity-card-subtitle">
-                Link visits and interactions across the past 7 days
-              </p>
+              <div className="activity-status-pill">
+                <span className="activity-pulse-dot" />
+                <span>Realtime Stats</span>
+              </div>
             </div>
-            <div className="activity-status-pill">
-              <span className="activity-pulse-dot" />
-              <span>Realtime Stats</span>
+
+            <div className="activity-bars-grid">
+              {weeklyData.map((item) => (
+                <div
+                  key={item.day}
+                  className={`activity-bar-col ${item.isToday ? "is-current-day" : ""}`}
+                >
+                  <span className="activity-bar-value t-num">{item.count}</span>
+                  <div className="activity-bar-track">
+                    <div
+                      className="activity-bar-fill"
+                      style={{ height: `${item.percentage}%` }}
+                    />
+                  </div>
+                  <span className="activity-bar-label">{item.day}</span>
+                </div>
+              ))}
             </div>
           </div>
 
-          <div className="activity-bars-grid">
-            {weeklyData.map((item) => (
-              <div
-                key={item.day}
-                className={`activity-bar-col ${item.isToday ? "is-current-day" : ""}`}
-              >
-                <span className="activity-bar-value t-num">{item.count}</span>
-                <div className="activity-bar-track">
-                  <div
-                    className="activity-bar-fill"
-                    style={{ height: `${item.percentage}%` }}
-                  />
+          {/* Right Column: Circular Progress Rings & Dark Productivity Card */}
+          <div className="dashboard-side-col">
+            <div className="progress-rings-card">
+              <div className="activity-card-header">
+                <div>
+                  <h3 className="activity-card-title">Library Health</h3>
+                  <p className="activity-card-subtitle">Organization & tag coverage</p>
                 </div>
-                <span className="activity-bar-label">{item.day}</span>
+                <span className="count-badge t-num">{totalCount} items</span>
               </div>
-            ))}
+
+              <div className="progress-rings-row">
+                <div className="progress-ring-item">
+                  <div className="progress-ring-circle-wrap">
+                    <svg height={68} width={68} className="progress-ring-svg">
+                      <circle
+                        stroke="var(--surface-sunken)"
+                        fill="transparent"
+                        strokeWidth={6}
+                        r={28}
+                        cx={34}
+                        cy={34}
+                      />
+                      <circle
+                        stroke="#8b5cf6"
+                        fill="transparent"
+                        strokeWidth={6}
+                        strokeDasharray={`${2 * Math.PI * 28}`}
+                        style={{
+                          strokeDashoffset:
+                            2 * Math.PI * 28 - (0.64 * 2 * Math.PI * 28),
+                        }}
+                        strokeLinecap="round"
+                        r={28}
+                        cx={34}
+                        cy={34}
+                        className="progress-ring-fill"
+                      />
+                    </svg>
+                    <span className="progress-ring-text t-num">64%</span>
+                  </div>
+                  <span className="progress-ring-label">Activity</span>
+                </div>
+
+                <div className="progress-ring-item">
+                  <div className="progress-ring-circle-wrap">
+                    <svg height={68} width={68} className="progress-ring-svg">
+                      <circle
+                        stroke="var(--surface-sunken)"
+                        fill="transparent"
+                        strokeWidth={6}
+                        r={28}
+                        cx={34}
+                        cy={34}
+                      />
+                      <circle
+                        stroke="#2563eb"
+                        fill="transparent"
+                        strokeWidth={6}
+                        strokeDasharray={`${2 * Math.PI * 28}`}
+                        style={{
+                          strokeDashoffset:
+                            2 * Math.PI * 28 -
+                            ((totalCount
+                              ? Math.min(1, lib.bookmarks.filter((b) => b.categoryId).length / totalCount || 0.85)
+                              : 0.85) *
+                              2 *
+                              Math.PI *
+                              28),
+                        }}
+                        strokeLinecap="round"
+                        r={28}
+                        cx={34}
+                        cy={34}
+                        className="progress-ring-fill"
+                      />
+                    </svg>
+                    <span className="progress-ring-text t-num">
+                      {totalCount
+                        ? Math.min(100, Math.round((lib.bookmarks.filter((b) => b.categoryId).length / totalCount) * 100) || 85)
+                        : 85}
+                      %
+                    </span>
+                  </div>
+                  <span className="progress-ring-label">Organized</span>
+                </div>
+
+                <div className="progress-ring-item">
+                  <div className="progress-ring-circle-wrap">
+                    <svg height={68} width={68} className="progress-ring-svg">
+                      <circle
+                        stroke="var(--surface-sunken)"
+                        fill="transparent"
+                        strokeWidth={6}
+                        r={28}
+                        cx={34}
+                        cy={34}
+                      />
+                      <circle
+                        stroke="#06b6d4"
+                        fill="transparent"
+                        strokeWidth={6}
+                        strokeDasharray={`${2 * Math.PI * 28}`}
+                        style={{
+                          strokeDashoffset:
+                            2 * Math.PI * 28 - (0.92 * 2 * Math.PI * 28),
+                        }}
+                        strokeLinecap="round"
+                        r={28}
+                        cx={34}
+                        cy={34}
+                        className="progress-ring-fill"
+                      />
+                    </svg>
+                    <span className="progress-ring-text t-num">92%</span>
+                  </div>
+                  <span className="progress-ring-label">Tagged</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Dark Accent Productivity Card & Achievements */}
+            <div className="analytics-duo-row">
+              <div className="dark-productivity-card">
+                <div className="dark-card-head">
+                  <span className="dark-card-title">Productivity</span>
+                  <span className="dark-card-pill">Per month</span>
+                </div>
+                <div className="dark-card-metrics">
+                  <div className="dark-metric-item">
+                    <div className="dark-metric-val t-num">{catCount}+</div>
+                    <div className="dark-metric-lbl">Stacks</div>
+                  </div>
+                  <div className="dark-metric-item">
+                    <div className="dark-metric-val t-num">{recentCount}+</div>
+                    <div className="dark-metric-lbl">Reads</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="achievements-mini-card">
+                <span className="achieve-title">Developer Badges</span>
+                <div className="achieve-icons-grid">
+                  <div className="achieve-icon-box achieve-blue" title="Active Explorer">
+                    <Icon name="sparkle" size={16} />
+                  </div>
+                  <div className="achieve-icon-box achieve-purple" title="Smart Stacker">
+                    <Icon name="layers" size={16} />
+                  </div>
+                  <div className="achieve-icon-box achieve-amber" title="Star Pinner">
+                    <Icon name="star" size={16} filled />
+                  </div>
+                  <div className="achieve-icon-box achieve-emerald" title="Verified Sync">
+                    <Icon name="checkCircle" size={16} />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

@@ -1090,6 +1090,221 @@ html.is-reordering .card {
   font-weight: 700;
 }
 
+.dashboard-analytics-layout {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-analytics-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dashboard-side-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Circular Progress Rings Card (inspired by ref4/ref5) */
+.progress-rings-card {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 22px 18px;
+  background: var(--surface);
+  border: 0.5px solid var(--edge);
+  border-radius: var(--r-panel);
+  box-shadow: var(--shadow-card);
+}
+
+.progress-rings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.progress-ring-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-ring-circle-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+}
+
+.progress-ring-svg {
+  transform: rotate(-90deg);
+  width: 68px;
+  height: 68px;
+}
+
+.progress-ring-fill {
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-ring-text {
+  position: absolute;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.progress-ring-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-align: center;
+}
+
+/* Analytics Duo Row: Dark Card + Badges */
+.analytics-duo-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 580px) {
+  .analytics-duo-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Dark Productivity Card (inspired by ref5.png) */
+.dark-productivity-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-radius: var(--r-card);
+  background: #18181b;
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(24, 24, 27, 0.25);
+}
+
+:root[data-theme="dark"] .dark-productivity-card {
+  background: #1e1e24;
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.dark-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #a1a1aa;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dark-card-pill {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.dark-card-metrics {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.dark-metric-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.dark-metric-val {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  line-height: 1.1;
+}
+
+.dark-metric-lbl {
+  font-size: 11px;
+  color: #a1a1aa;
+  margin-top: 2px;
+}
+
+/* Achievements Badges Card (inspired by ref5.png) */
+.achievements-mini-card {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 16px 14px;
+  background: var(--surface);
+  border: 0.5px solid var(--edge);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-card);
+}
+
+.achieve-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  margin-bottom: 10px;
+}
+
+.achieve-icons-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+
+.achieve-icon-box {
+  display: grid;
+  place-items: center;
+  height: 36px;
+  border-radius: 10px;
+  transition: transform var(--t-fast) var(--ease-out);
+  cursor: pointer;
+}
+
+.achieve-icon-box:hover {
+  transform: scale(1.08);
+}
+
+.achieve-blue {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+
+.achieve-purple {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+}
+
+.achieve-amber {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.achieve-emerald {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
 .dashboard-main-section {
   margin-top: 4px;
 }
