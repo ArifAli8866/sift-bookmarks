@@ -1513,3 +1513,38 @@
   font-size: var(--fs-micro);
   color: var(--text-3);
 }
+
+/* ---------------- mobile auth and onboarding polish ---------------- */
+
+@media (max-width: 680px) {
+  .onboarding-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .onboarding-card {
+    width: 100%;
+    max-height: 90dvh;
+    overflow-y: auto;
+    border-radius: 20px 20px 0 0;
+    padding: 24px 18px max(24px, calc(16px + env(safe-area-inset-bottom)));
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 16px 12px;
+  }
+
+  .auth-card {
+    padding: 24px 18px;
+    border-radius: var(--r-card);
+  }
+
+  .auth-title {
+    font-size: 17px;
+  }
+}

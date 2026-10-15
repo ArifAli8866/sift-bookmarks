@@ -1524,6 +1524,8 @@ html.is-reordering .card {
   font-size: var(--fs-base);
   color: var(--text-3);
   margin: 0 0 16px 0;
+}
+
 /* Dashboard View Mode Tabs */
 .dashboard-view-mode-tabs {
   display: inline-flex;

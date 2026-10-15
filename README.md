@@ -44,6 +44,17 @@ Keep the tools you rely on close, group them around the way you work, and get ba
 | 🔐 | **Personal workspace** | Keep each account's library associated with its own workspace. |
 | ✨ | **Suggestions** | Browse popular resources and add only the ones you actually want. |
 
+### SaaS UI & Mobile Architecture
+
+Sift features a high-end SaaS dashboard aesthetic inspired by modern enterprise tooling, pairing soft neumorphic tactile surfaces with high-density information architecture:
+
+- 📊 **Executive Overview & Analytics**: Weekly activity analytics bar chart, circular progress metrics rings, and dark accent productivity banner tracking weekly targets.
+- 🎛️ **Neumorphic Tactile Controls**: Soft inset fields, pill-shaped segmented controls, tactile switch toggles, and elevation shadows calibrated for light and dark themes.
+- 📋 **Interactive Data Tables**: Rich bookmarks table with real-time status badges, domain chips, and quick action docks (open, copy, star, and contextual menus).
+- 📱 **Mobile Floating Navigation**: Thumb-friendly bottom navigation bar with active indicators and elevated center quick-add button for phones (<680px).
+- 📲 **Mobile Bottom Sheets**: Dialogs and command palette gracefully convert into native-feeling mobile bottom sheets with drag/pull handles and safe area inset support.
+- ⚡ **Touch Target Optimization**: All interactive elements adhere to minimum 44px hitboxes on touch devices (`@media (pointer: coarse)`).
+
 ### Your library, your choices
 
 New users can start from popular suggestions—GitHub, MDN, React, Vercel, Neon, npm, and more. **Suggestions are never added automatically.** You choose what belongs in your library.
