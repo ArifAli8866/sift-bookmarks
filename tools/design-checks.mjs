@@ -9,12 +9,13 @@
  */
 import { readFileSync, writeFileSync, mkdirSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const ts = require("typescript");
 
-const root = new URL("..", import.meta.url).pathname;
+const root = fileURLToPath(new URL("..", import.meta.url));
 const outDir = join(root, "node_modules", ".cache", "sift-checks");
 mkdirSync(outDir, { recursive: true });
 

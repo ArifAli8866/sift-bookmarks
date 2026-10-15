@@ -22,4 +22,9 @@ tsconfig.tsbuildinfo
 .sudo_as_admin_successful
 .data
 
+# Reference assets
+ref*.jpeg
+ref*.png
+
+
 
