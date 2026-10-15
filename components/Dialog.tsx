@@ -34,6 +34,7 @@ export function Dialog({
       labelledBy={id}
       initialFocus={initialFocus}
     >
+      <div className="sheet-handle" aria-hidden="true" />
       <div className="dialog-head">
         <h2 className="dialog-title" id={id}>
           {title}
