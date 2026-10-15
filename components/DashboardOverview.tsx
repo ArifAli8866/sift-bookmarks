@@ -120,13 +120,19 @@ export function DashboardOverview({
           tabIndex={0}
           onClick={() => setScope({ kind: "all" })}
         >
-          <div className="stat-card-icon-box stat-icon-blue">
-            <Icon name="bookmark" size={18} />
+          <div className="stat-card-top">
+            <div className="stat-card-icon-box stat-icon-blue">
+              <Icon name="bookmark" size={18} />
+            </div>
+            <span className="stat-trend-pill trend-blue">All Saved</span>
           </div>
           <div className="stat-card-content">
             <div className="stat-card-value t-num">{totalCount}</div>
             <div className="stat-card-label">Total Bookmarks</div>
             <div className="stat-card-meta">Active in library</div>
+          </div>
+          <div className="stat-card-bar-wrap">
+            <div className="stat-card-bar bar-blue" style={{ width: "100%" }} />
           </div>
         </div>
 
@@ -136,13 +142,26 @@ export function DashboardOverview({
           tabIndex={0}
           onClick={() => setScope({ kind: "favorites" })}
         >
-          <div className="stat-card-icon-box stat-icon-amber">
-            <Icon name="star" size={18} filled />
+          <div className="stat-card-top">
+            <div className="stat-card-icon-box stat-icon-amber">
+              <Icon name="star" size={18} filled />
+            </div>
+            <span className="stat-trend-pill trend-amber">Pinned</span>
           </div>
           <div className="stat-card-content">
             <div className="stat-card-value t-num">{favCount}</div>
             <div className="stat-card-label">Favourites</div>
-            <div className="stat-card-meta">Pinned shortcuts</div>
+            <div className="stat-card-meta">
+              {totalCount > 0 ? `${Math.round((favCount / totalCount) * 100)}% of total` : "Quick access"}
+            </div>
+          </div>
+          <div className="stat-card-bar-wrap">
+            <div
+              className="stat-card-bar bar-amber"
+              style={{
+                width: `${totalCount ? Math.min(100, Math.round((favCount / totalCount) * 100)) : 0}%`,
+              }}
+            />
           </div>
         </div>
 
@@ -152,13 +171,22 @@ export function DashboardOverview({
           tabIndex={0}
           onClick={() => onNewCategory()}
         >
-          <div className="stat-card-icon-box stat-icon-purple">
-            <Icon name="folder" size={18} />
+          <div className="stat-card-top">
+            <div className="stat-card-icon-box stat-icon-purple">
+              <Icon name="folder" size={18} />
+            </div>
+            <span className="stat-trend-pill trend-purple">Stacks</span>
           </div>
           <div className="stat-card-content">
             <div className="stat-card-value t-num">{catCount}</div>
             <div className="stat-card-label">Categories</div>
-            <div className="stat-card-meta">Custom stacks</div>
+            <div className="stat-card-meta">Custom collections</div>
+          </div>
+          <div className="stat-card-bar-wrap">
+            <div
+              className="stat-card-bar bar-purple"
+              style={{ width: `${Math.min(100, catCount * 25)}%` }}
+            />
           </div>
         </div>
 
@@ -168,13 +196,24 @@ export function DashboardOverview({
           tabIndex={0}
           onClick={() => setScope({ kind: "recent" })}
         >
-          <div className="stat-card-icon-box stat-icon-emerald">
-            <Icon name="clock" size={18} />
+          <div className="stat-card-top">
+            <div className="stat-card-icon-box stat-icon-emerald">
+              <Icon name="clock" size={18} />
+            </div>
+            <span className="stat-trend-pill trend-emerald">This Week</span>
           </div>
           <div className="stat-card-content">
             <div className="stat-card-value t-num">{recentCount}</div>
             <div className="stat-card-label">Recent Links</div>
-            <div className="stat-card-meta">Last 7 days</div>
+            <div className="stat-card-meta">Visited in last 7 days</div>
+          </div>
+          <div className="stat-card-bar-wrap">
+            <div
+              className="stat-card-bar bar-emerald"
+              style={{
+                width: `${totalCount ? Math.min(100, Math.round((recentCount / totalCount) * 100)) : 0}%`,
+              }}
+            />
           </div>
         </div>
       </section>
