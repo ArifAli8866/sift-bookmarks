@@ -12,6 +12,7 @@ import { AuthView } from "./AuthView";
 import { OnboardingModal } from "./OnboardingModal";
 import { ConfirmDialog, ShortcutsDialog } from "./Dialog";
 import { Toasts } from "./Toasts";
+import { MobileNav } from "./MobileNav";
 import type { ItemActions } from "./itemActions";
 import { useLibrary, useLibraryReady } from "../lib/hooks";
 import { pushToast } from "../lib/toast";
@@ -217,6 +218,11 @@ export function App() {
 
   const shown = visibleBookmarks(lib).length;
 
+  const favCount = useMemo(
+    () => lib.bookmarks.filter((b) => b.favorite || b.isFavorite).length,
+    [lib.bookmarks]
+  );
+
   const handleScope = (scope: Scope) => {
     setScope(scope);
     setMobileNav(false);
@@ -304,6 +310,15 @@ export function App() {
           />
         </main>
       </div>
+
+      <MobileNav
+        currentScopeKind={lib.scope.kind}
+        onScope={handleScope}
+        onNewBookmark={() => openNew(scopeCategoryId)}
+        onOpenPalette={() => setPaletteOpen(true)}
+        onToggleSidebar={() => setMobileNav((v) => !v)}
+        favoritesCount={favCount}
+      />
 
       <CommandPalette
         open={paletteOpen}
