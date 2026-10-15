@@ -86,6 +86,14 @@
   }
 }
 
+@media (max-width: 680px) {
+  .grid {
+    --card-min: 100%;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
 /* -------------------------------- card ----------------------------- */
 
 .card {
@@ -561,7 +569,7 @@
   .row {
     grid-template-columns: minmax(0, 1fr) 24px;
     gap: 8px;
-    height: 54px;
+    height: 52px;
     padding: 0 10px;
   }
 
@@ -572,6 +580,54 @@
 
   .row-actions .more-btn {
     display: none;
+  }
+}
+
+@media (max-width: 680px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    height: 52px;
+    padding: 0 12px;
+  }
+
+  .row-url,
+  .row-col {
+    display: none;
+  }
+
+  .row-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .row-actions .more-btn {
+    display: inline-flex;
+  }
+
+  .row .fav-btn,
+  .row .more-btn {
+    opacity: 0.85;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--r-btn);
+    background: var(--surface-sunken);
+    border: 0.5px solid var(--edge);
+  }
+
+  .card-foot {
+    min-height: 40px;
+  }
+
+  .card-actions .icon-btn {
+    width: 30px;
+    height: 30px;
+    opacity: 0.85;
+  }
+
+  .chip-btn {
+    min-height: 28px;
   }
 }
 

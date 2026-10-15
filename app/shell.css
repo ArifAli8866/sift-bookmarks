@@ -685,7 +685,18 @@
 @media (max-width: 680px) {
   :root {
     --gutter: 14px;
-    --toolbar-h: 48px;
+    --toolbar-h: 50px;
+  }
+
+  .main {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .toolbar {
+    padding: 0 14px;
+    padding-left: calc(14px + env(safe-area-inset-left));
+    padding-right: calc(14px + env(safe-area-inset-right));
   }
 
   .search {
@@ -693,11 +704,16 @@
   }
 
   .toolbar-actions {
-    gap: 6px;
+    gap: 8px;
   }
 
   .t-title {
     font-size: var(--fs-lg);
+  }
+
+  .icon-btn {
+    width: 36px;
+    height: 36px;
   }
 }
 
