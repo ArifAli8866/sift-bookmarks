@@ -17,6 +17,7 @@ import {
 } from "../lib/store";
 import { buildItemEntries, type ItemActions } from "./itemActions";
 import { pushToast } from "../lib/toast";
+import { domainOf, shortRelative } from "../lib/format";
 
 export function DashboardOverview({
   lib,
@@ -37,6 +38,8 @@ export function DashboardOverview({
   const [addedSuggestions, setAddedSuggestions] = useState<Set<string>>(new Set());
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const [menu, setMenu] = useState<{ anchor: HTMLElement; bookmark: Bookmark } | null>(null);
+  const [overviewView, setOverviewView] = useState<"table" | "grid">("table");
+  const [selectedBookmarkIds, setSelectedBookmarkIds] = useState<Set<string>>(new Set());
 
   // Dynamic greeting based on current time
   const greeting = useMemo(() => {
@@ -476,9 +479,29 @@ export function DashboardOverview({
       <section className="dashboard-main-section">
         <div className="dashboard-section-header">
           <div className="dashboard-section-title">
-            <span>Your bookmarks</span>
+            <span>Recent bookmarks</span>
             <span className="count-badge t-num">{totalCount}</span>
           </div>
+
+          <div className="dashboard-view-mode-tabs" role="group" aria-label="View format">
+            <button
+              type="button"
+              className={`table-view-tab ${overviewView === "table" ? "is-active" : ""}`}
+              onClick={() => setOverviewView("table")}
+            >
+              <Icon name="list" size={13} />
+              <span>Table</span>
+            </button>
+            <button
+              type="button"
+              className={`table-view-tab ${overviewView === "grid" ? "is-active" : ""}`}
+              onClick={() => setOverviewView("grid")}
+            >
+              <Icon name="grid" size={13} />
+              <span>Cards</span>
+            </button>
+          </div>
+
           <span className="spacer" />
           {totalCount > 0 ? (
             <button
@@ -506,6 +529,120 @@ export function DashboardOverview({
                 <Icon name="plus" size={14} />
                 <span>Add your first bookmark</span>
               </button>
+            </div>
+          </div>
+        ) : overviewView === "table" ? (
+          /* SaaS Recent Bookmarks Table (inspired by ref4/ref5) */
+          <div className="recent-table-card">
+            <div className="recent-table-head">
+              <div className="th-check" />
+              <div className="th-name">Bookmark</div>
+              <div className="th-category">Stack</div>
+              <div className="th-status">Status</div>
+              <div className="th-time">Time</div>
+              <div className="th-actions">Actions</div>
+            </div>
+            <div className="recent-table-body">
+              {lib.bookmarks.slice(0, 7).map((b) => {
+                const cat = b.categoryId ? categoryMap.get(b.categoryId) : undefined;
+                const isSelected = selectedBookmarkIds.has(b.id);
+                const isFav = b.favorite || b.isFavorite;
+                return (
+                  <div
+                    key={b.id}
+                    className={`recent-table-row ${isSelected ? "is-selected" : ""}`}
+                    onClick={() => actions.open(b)}
+                  >
+                    <div
+                      className="td-check"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedBookmarkIds((prev) => {
+                          const next = new Set(prev);
+                          if (next.has(b.id)) next.delete(b.id);
+                          else next.add(b.id);
+                          return next;
+                        });
+                      }}
+                    >
+                      <span className={`table-checkbox ${isSelected ? "is-checked" : ""}`}>
+                        {isSelected ? <Icon name="check" size={10} strokeWidth={2.6} /> : null}
+                      </span>
+                    </div>
+
+                    <div className="td-name">
+                      <div className="table-favicon-box">
+                        <Favicon url={b.url} size={18} />
+                      </div>
+                      <div className="table-title-col truncate">
+                        <span className="table-title-txt truncate">{b.title}</span>
+                        <span className="table-url-sub truncate">{domainOf(b.url)}</span>
+                      </div>
+                    </div>
+
+                    <div className="td-category">
+                      {cat ? (
+                        <span className="table-cat-pill">
+                          <span
+                            className="table-cat-dot"
+                            style={{ backgroundColor: cat.color || "var(--accent)" }}
+                          />
+                          <span>{cat.name}</span>
+                        </span>
+                      ) : (
+                        <span className="table-cat-pill is-unfiled">
+                          <span>Uncategorized</span>
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="td-status">
+                      {isFav ? (
+                        <span className="table-status-pill status-pinned">
+                          <Icon name="star" size={10} filled />
+                          <span>Pinned</span>
+                        </span>
+                      ) : (
+                        <span className="table-status-pill status-active">
+                          <span className="status-dot" />
+                          <span>Active</span>
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="td-time t-num">
+                      {shortRelative(b.lastOpenedAt || b.addedAt)}
+                    </div>
+
+                    <div className="td-actions" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        type="button"
+                        className="table-action-btn"
+                        title={isFav ? "Remove favourite" : "Add favourite"}
+                        onClick={() => actions.toggleFavorite(b.id)}
+                      >
+                        <Icon name="star" size={13} filled={isFav} style={{ color: isFav ? "var(--fav)" : undefined }} />
+                      </button>
+                      <button
+                        type="button"
+                        className="table-action-btn"
+                        title="Copy link"
+                        onClick={() => actions.copy(b)}
+                      >
+                        <Icon name="link" size={13} />
+                      </button>
+                      <button
+                        type="button"
+                        className="table-action-btn"
+                        title="More options"
+                        onClick={(e) => setMenu({ bookmark: b, anchor: e.currentTarget })}
+                      >
+                        <Icon name="ellipsis" size={13} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         ) : (

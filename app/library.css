@@ -1387,7 +1387,245 @@ html.is-reordering .card {
   font-size: var(--fs-base);
   color: var(--text-3);
   margin: 0 0 16px 0;
-  line-height: 1.45;
+/* Dashboard View Mode Tabs */
+.dashboard-view-mode-tabs {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+  background: var(--surface-sunken);
+  border-radius: 8px;
+  gap: 2px;
+}
+
+.table-view-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 550;
+  color: var(--text-3);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease-out);
+}
+
+.table-view-tab:hover {
+  color: var(--text);
+}
+
+.table-view-tab.is-active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Recent Bookmarks SaaS Table (inspired by ref4/ref5) */
+.recent-table-card {
+  width: 100%;
+  background: var(--surface);
+  border: 0.5px solid var(--edge);
+  border-radius: var(--r-panel);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.recent-table-head {
+  display: grid;
+  grid-template-columns: 44px minmax(200px, 1.8fr) 1.2fr 110px 90px 100px;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--surface-sunken);
+  border-bottom: 0.5px solid var(--separator);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: 0.02em;
+}
+
+.recent-table-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.recent-table-row {
+  display: grid;
+  grid-template-columns: 44px minmax(200px, 1.8fr) 1.2fr 110px 90px 100px;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 0.5px solid var(--separator-soft);
+  transition: background-color var(--t-fast) var(--ease-out);
+  cursor: pointer;
+}
+
+.recent-table-row:last-child {
+  border-bottom: none;
+}
+
+.recent-table-row:hover {
+  background: rgba(37, 99, 235, 0.03);
+}
+
+.recent-table-row.is-selected {
+  background: rgba(37, 99, 235, 0.06);
+}
+
+.td-check,
+.th-check {
+  display: flex;
+  align-items: center;
+}
+
+.table-checkbox {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1px solid var(--edge-strong);
+  background: var(--surface);
+  transition: all var(--t-fast) var(--ease-out);
+}
+
+.table-checkbox.is-checked {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+.td-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.table-favicon-box {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  background: var(--surface-sunken);
+  flex: none;
+}
+
+.table-title-col {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.table-title-txt {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.table-url-sub {
+  font-size: 11px;
+  color: var(--text-4);
+  font-family: var(--font-mono);
+}
+
+.table-cat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  background: var(--surface-sunken);
+  font-size: 11.5px;
+  font-weight: 550;
+  color: var(--text-2);
+}
+
+.table-cat-pill.is-unfiled {
+  color: var(--text-4);
+  font-style: italic;
+}
+
+.table-cat-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.table-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.status-active {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+
+.status-pinned {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+}
+
+.status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.td-time {
+  font-size: 11.5px;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+}
+
+.td-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.table-action-btn {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  color: var(--text-3);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease-out);
+}
+
+.table-action-btn:hover {
+  background: var(--tint-strong);
+  color: var(--text);
+}
+
+@media (max-width: 800px) {
+  .recent-table-head {
+    display: none;
+  }
+  .recent-table-row {
+    grid-template-columns: 36px 1fr auto;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  .td-category,
+  .td-status,
+  .td-time {
+    display: none;
+  }
 }
 
 .dashboard-suggestions-section {
