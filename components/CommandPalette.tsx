@@ -52,6 +52,7 @@ export function CommandPalette({
 }) {
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
+  const [filter, setFilter] = useState<"all" | "bookmark" | "collection" | "action">("all");
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -59,8 +60,13 @@ export function CommandPalette({
     if (open) {
       setQuery("");
       setActive(0);
+      setFilter("all");
     }
   }, [open]);
+
+  useEffect(() => {
+    setActive(0);
+  }, [filter]);
 
   const rows = useMemo<Row[]>(() => {
     const q = query.trim();
@@ -246,8 +252,13 @@ export function CommandPalette({
     node?.scrollIntoView({ block: "nearest" });
   }, [active]);
 
+  const displayRows = useMemo(() => {
+    if (filter === "all") return rows;
+    return rows.filter((r) => r.kind === filter);
+  }, [rows, filter]);
+
   const grouped: { label: string; rows: { row: Row; index: number }[] }[] = [];
-  rows.forEach((row, index) => {
+  displayRows.forEach((row, index) => {
     const label = row.group;
     const bucket = grouped[grouped.length - 1];
     if (bucket && bucket.label === label) bucket.rows.push({ row, index });
@@ -255,7 +266,7 @@ export function CommandPalette({
   });
 
   const commit = (index: number, shift: boolean) => {
-    const row = rows[index];
+    const row = displayRows[index];
     if (!row) return;
     row.run(shift);
     onClose();
@@ -263,6 +274,7 @@ export function CommandPalette({
 
   return (
     <Overlay open={open} onClose={onClose} align="top" className="palette" initialFocus="input">
+      <div className="sheet-handle" aria-hidden="true" />
       <div className="palette-input-row">
         <Icon name="search" size={16} />
         <input
@@ -281,16 +293,16 @@ export function CommandPalette({
           onKeyDown={(e) => {
             if (e.key === "ArrowDown") {
               e.preventDefault();
-              setActive((i) => (rows.length ? (i + 1) % rows.length : 0));
+              setActive((i) => (displayRows.length ? (i + 1) % displayRows.length : 0));
             } else if (e.key === "ArrowUp") {
               e.preventDefault();
-              setActive((i) => (rows.length ? (i - 1 + rows.length) % rows.length : 0));
+              setActive((i) => (displayRows.length ? (i - 1 + displayRows.length) % displayRows.length : 0));
             } else if (e.key === "Home") {
               e.preventDefault();
               setActive(0);
             } else if (e.key === "End") {
               e.preventDefault();
-              setActive(Math.max(0, rows.length - 1));
+              setActive(Math.max(0, displayRows.length - 1));
             } else if (e.key === "Enter") {
               e.preventDefault();
               commit(active, e.shiftKey);
@@ -302,11 +314,63 @@ export function CommandPalette({
             }
           }}
         />
+        {query ? (
+          <button
+            type="button"
+            className="palette-clear-btn"
+            aria-label="Clear search"
+            onClick={() => {
+              setQuery("");
+              inputRef.current?.focus();
+            }}
+          >
+            <Icon name="close" size={12} />
+          </button>
+        ) : null}
         {query ? <kbd aria-hidden="true">esc</kbd> : null}
       </div>
 
+      <div className="palette-filters" role="tablist" aria-label="Palette filters">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={filter === "all"}
+          className={`palette-filter-chip${filter === "all" ? " is-active" : ""}`}
+          onClick={() => setFilter("all")}
+        >
+          All
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={filter === "bookmark"}
+          className={`palette-filter-chip${filter === "bookmark" ? " is-active" : ""}`}
+          onClick={() => setFilter("bookmark")}
+        >
+          Bookmarks
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={filter === "collection"}
+          className={`palette-filter-chip${filter === "collection" ? " is-active" : ""}`}
+          onClick={() => setFilter("collection")}
+        >
+          Collections
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={filter === "action"}
+          className={`palette-filter-chip${filter === "action" ? " is-active" : ""}`}
+          onClick={() => setFilter("action")}
+        >
+          Actions
+        </button>
+      </div>
+
       <div className="palette-list scroll" id="palette-list" ref={listRef} role="listbox" aria-label="Results">
-        {rows.length === 0 ? (
+        {displayRows.length === 0 ? (
           <div className="palette-empty">
             <Icon name="search" size={15} />
             <span>
@@ -362,7 +426,7 @@ export function CommandPalette({
         </span>
         <span className="spacer" />
         <span className="t-mono" style={{ fontSize: 10 }}>
-          {rows.length} result{rows.length === 1 ? "" : "s"}
+          {displayRows.length} result{displayRows.length === 1 ? "" : "s"}
         </span>
       </div>
     </Overlay>
