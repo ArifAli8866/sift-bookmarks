@@ -273,6 +273,7 @@ export function App() {
           pushToast("Signed out");
         }}
         onScope={handleScope}
+        onOpenPalette={() => setPaletteOpen(true)}
       />
 
       <div className="sidebar-scrim" onPointerDown={() => setMobileNav(false)} aria-hidden="true" />

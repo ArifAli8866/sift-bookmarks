@@ -44,6 +44,7 @@ export function Sidebar({
   onShowShortcuts,
   onLogout,
   onScope,
+  onOpenPalette,
 }: {
   lib: LibraryState;
   onNewBookmark: (categoryId: string | null) => void;
@@ -54,11 +55,13 @@ export function Sidebar({
   onShowShortcuts: () => void;
   onLogout: () => void;
   onScope: (scope: Scope) => void;
+  onOpenPalette?: () => void;
 }) {
   const [menuFor, setMenuFor] = useState<{ anchor: HTMLElement; id: string } | null>(null);
   const [userMenu, setUserMenu] = useState<HTMLElement | null>(null);
   const [themeMenu, setThemeMenu] = useState<HTMLElement | null>(null);
   const [tagsOpen, setTagsOpen] = useState(false);
+  const [aiCardVisible, setAiCardVisible] = useState(true);
 
   const tags = useMemo(() => tagCounts(lib), [lib]);
   const shownTags = tagsOpen ? tags : tags.slice(0, 5);
@@ -253,6 +256,37 @@ export function Sidebar({
             </nav>
           ) : null}
         </div>
+
+        {/* AI Assistant card widget inspired by SaaS dashboard reference */}
+        {aiCardVisible ? (
+          <div className="sidebar-ai-card">
+            <div className="ai-card-head">
+              <div className="ai-card-badge">
+                <Icon name="sparkle" size={13} />
+                <span>AI Assistant</span>
+              </div>
+              <button
+                type="button"
+                className="ai-card-close"
+                aria-label="Dismiss AI Assistant tip"
+                onClick={() => setAiCardVisible(false)}
+              >
+                <Icon name="close" size={12} />
+              </button>
+            </div>
+            <p className="ai-card-desc">
+              Auto-enrich links, discover smart tags, and find shortcuts effortlessly.
+            </p>
+            <button
+              type="button"
+              className="ai-card-btn"
+              onClick={() => onOpenPalette?.()}
+            >
+              <span>Explore AI Search</span>
+              <Icon name="chevronRight" size={12} />
+            </button>
+          </div>
+        ) : null}
 
         {/* Footer: User profile & quick toggles */}
         <div className="sidebar-foot">
