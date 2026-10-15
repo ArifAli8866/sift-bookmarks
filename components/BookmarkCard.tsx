@@ -78,8 +78,8 @@ export function BookmarkCard({
             </a>
           </h3>
           <p className="card-url" title={bookmark.url}>
-            <span className="card-url-host">{host}</span>
-            <span className="card-url-path">{path}</span>
+            <span className="card-domain-chip card-url-host">{host}</span>
+            {path && path !== "/" && <span className="card-url-path">{path}</span>}
           </p>
         </div>
       </div>
@@ -193,7 +193,9 @@ export function BookmarkRow({
       }}
     >
       <div className="row-title-wrap">
-        <Favicon url={bookmark.url} size={18} />
+        <div className="row-icon-wrap">
+          <Favicon url={bookmark.url} size={16} />
+        </div>
         <span className="row-title truncate">
           <a
             className="row-link"
@@ -212,8 +214,8 @@ export function BookmarkRow({
       </div>
 
       <p className="row-url" title={bookmark.url}>
-        <b>{host}</b>
-        {path}
+        <span className="row-domain-chip">{host}</span>
+        {path && path !== "/" && <span className="row-url-path">{path}</span>}
       </p>
 
       <div className="row-col row-col-tags" title={tag ? `#${tag}` : undefined}>
