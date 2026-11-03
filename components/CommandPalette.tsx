@@ -39,6 +39,7 @@ export function CommandPalette({
   onEditBookmark,
   onCycleTheme,
   onShowShortcuts,
+  onOpenShare,
 }: {
   open: boolean;
   lib: LibraryState;
@@ -49,6 +50,7 @@ export function CommandPalette({
   onEditBookmark: (id: string) => void;
   onCycleTheme: () => void;
   onShowShortcuts: () => void;
+  onOpenShare?: () => void;
 }) {
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
@@ -188,6 +190,17 @@ export function CommandPalette({
       { id: "a-all", label: "Show all bookmarks", icon: "bookmark", kbd: "⌘1", run: () => onScope({ kind: "all" }) },
       { id: "a-new", label: "New bookmark", icon: "plus", kbd: "⌘N", run: onNewBookmark },
       { id: "a-collection", label: "Create category", icon: "folder", kbd: "", run: onNewCollection },
+      ...(onOpenShare
+        ? [
+            {
+              id: "a-share",
+              label: "Share bookmarks with friends…",
+              icon: "share" as const,
+              kbd: "",
+              run: onOpenShare,
+            },
+          ]
+        : []),
       { id: "a-fav", label: "Show favourites", icon: "star", kbd: "⌘2", run: () => onScope({ kind: "favorites" }) },
       { id: "a-recent", label: "Show recent", icon: "clock", kbd: "⌘3", run: () => onScope({ kind: "recent" }) },
       {

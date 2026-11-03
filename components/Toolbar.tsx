@@ -21,6 +21,7 @@ export function Toolbar({
   onToggleSidebar,
   onNewBookmark,
   onOpenPalette,
+  onOpenShare,
 }: {
   lib: LibraryState;
   title: string;
@@ -30,6 +31,7 @@ export function Toolbar({
   onToggleSidebar: () => void;
   onNewBookmark: () => void;
   onOpenPalette: () => void;
+  onOpenShare?: () => void;
 }) {
   const [sortAnchor, setSortAnchor] = useState<HTMLElement | null>(null);
   const segRef = useRef<HTMLDivElement>(null);
@@ -176,6 +178,19 @@ export function Toolbar({
         >
           <Icon name="sort" size={15} />
         </button>
+
+        {onOpenShare ? (
+          <button
+            type="button"
+            className="btn btn-quiet toolbar-share-btn"
+            aria-label="Share bookmarks with friend"
+            title="Share bookmarks with friends via link"
+            onClick={onOpenShare}
+          >
+            <Icon name="share" size={13.5} />
+            <span>Share</span>
+          </button>
+        ) : null}
 
         <button type="button" className="btn btn-primary" onClick={onNewBookmark} title="New bookmark (⌘N)">
           <Icon name="plus" size={14} />

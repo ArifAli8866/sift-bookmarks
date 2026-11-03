@@ -54,6 +54,7 @@ export type IconName =
   | "layers"
   | "copy"
   | "checkCircle"
+  | "share"
   | "sift";
 
 type Props = SVGProps<SVGSVGElement> & { size?: number };
@@ -407,6 +408,15 @@ export function Icon({ name, filled, ...rest }: Props & { name: IconName; filled
         <Svg {...rest}>
           <rect x="8.5" y="8.5" width="11" height="11" rx="1.5" />
           <path d="M5 15.5H4.5a1.5 1.5 0 01-1.5-1.5V4.5A1.5 1.5 0 014.5 3H14a1.5 1.5 0 011.5 1.5v.5" />
+        </Svg>
+      );
+    case "share":
+      return (
+        <Svg {...rest}>
+          <circle cx="18" cy="5.5" r="2.75" />
+          <circle cx="6" cy="12" r="2.75" />
+          <circle cx="18" cy="18.5" r="2.75" />
+          <path d="M8.5 10.65l7-3.8M8.5 13.35l7 3.8" />
         </Svg>
       );
     case "sift":

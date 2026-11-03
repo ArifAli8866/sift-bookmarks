@@ -11,6 +11,13 @@ import { SettingsDialog } from "./SettingsDialog";
 import { AuthView } from "./AuthView";
 import { OnboardingModal } from "./OnboardingModal";
 import { ConfirmDialog, ShortcutsDialog } from "./Dialog";
+import { ShareDialog } from "./ShareDialog";
+import { SharedImportDialog } from "./SharedImportDialog";
+import {
+  extractShareFromCurrentUrl,
+  clearShareFromCurrentUrl,
+  type SharedPackPayload,
+} from "../lib/share";
 import { Toasts } from "./Toasts";
 import { MobileNav } from "./MobileNav";
 import type { ItemActions } from "./itemActions";
@@ -61,7 +68,27 @@ export function App() {
     onConfirm: () => void;
   } | null>(null);
   const [mobileNav, setMobileNav] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [incomingShare, setIncomingShare] = useState<SharedPackPayload | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+
+  // Check for shared bookmarks link on initial mount or navigation
+  useEffect(() => {
+    const pack = extractShareFromCurrentUrl();
+    if (pack) {
+      setIncomingShare(pack);
+    }
+  }, []);
+
+  const handleCloseImport = useCallback(() => {
+    clearShareFromCurrentUrl();
+    setIncomingShare(null);
+  }, []);
+
+  const existingUrls = useMemo(
+    () => new Set(lib.bookmarks.map((b) => b.url.toLowerCase())),
+    [lib.bookmarks]
+  );
 
   /* ------------------------------- theme ----------------------------- */
   useEffect(() => {
@@ -100,6 +127,8 @@ export function App() {
     !!categoryForm ||
     settingsOpen ||
     shortcuts ||
+    shareOpen ||
+    !!incomingShare ||
     !!confirmState;
 
   useEffect(() => {
@@ -240,11 +269,18 @@ export function App() {
   const editingCategory: Category | null =
     categoryForm?.id ? (lib.categories.find((c) => c.id === categoryForm.id) ?? null) : null;
 
-  // Unauthenticated user: show the beautiful authentication experience
+  // Unauthenticated user: show the authentication experience
   if (lib.hydrated && !lib.authenticated) {
     return (
       <>
         <AuthView />
+        {incomingShare ? (
+          <SharedImportDialog
+            pack={incomingShare}
+            existingUrls={existingUrls}
+            onClose={handleCloseImport}
+          />
+        ) : null}
         <Toasts />
       </>
     );
@@ -280,6 +316,7 @@ export function App() {
         }}
         onScope={handleScope}
         onOpenPalette={() => setPaletteOpen(true)}
+        onOpenShare={() => setShareOpen(true)}
       />
 
       <div className="sidebar-scrim" onPointerDown={() => setMobileNav(false)} aria-hidden="true" />
@@ -297,6 +334,7 @@ export function App() {
           }}
           onNewBookmark={() => openNew(scopeCategoryId)}
           onOpenPalette={() => setPaletteOpen(true)}
+          onOpenShare={() => setShareOpen(true)}
         />
 
         <main className="scroller scroll" data-scroll-root>
@@ -307,6 +345,7 @@ export function App() {
             onNewBookmark={() => openNew(scopeCategoryId)}
             onNewCategory={() => setCategoryForm({ mode: "new" })}
             onOpenPalette={() => setPaletteOpen(true)}
+            onOpenShare={() => setShareOpen(true)}
           />
         </main>
       </div>
@@ -330,6 +369,7 @@ export function App() {
         onEditBookmark={(id) => setForm({ mode: "edit", id })}
         onCycleTheme={cycleTheme}
         onShowShortcuts={() => setShortcuts(true)}
+        onOpenShare={() => setShareOpen(true)}
       />
 
       <BookmarkDialog
@@ -408,6 +448,19 @@ export function App() {
         confirmLabel={confirmState?.confirmLabel ?? "Delete"}
         onConfirm={() => confirmState?.onConfirm()}
         onClose={() => setConfirmState(null)}
+      />
+
+      <ShareDialog
+        open={shareOpen}
+        lib={lib}
+        onClose={() => setShareOpen(false)}
+        onPreviewPack={(pack) => setIncomingShare(pack)}
+      />
+
+      <SharedImportDialog
+        pack={incomingShare}
+        existingUrls={existingUrls}
+        onClose={handleCloseImport}
       />
 
       <Toasts />

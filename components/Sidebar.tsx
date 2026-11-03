@@ -46,6 +46,7 @@ export function Sidebar({
   onLogout,
   onScope,
   onOpenPalette,
+  onOpenShare,
 }: {
   lib: LibraryState;
   onNewBookmark: (categoryId: string | null) => void;
@@ -57,6 +58,7 @@ export function Sidebar({
   onLogout: () => void;
   onScope: (scope: Scope) => void;
   onOpenPalette?: () => void;
+  onOpenShare?: () => void;
 }) {
   const [menuFor, setMenuFor] = useState<{ anchor: HTMLElement; id: string } | null>(null);
   const [userMenu, setUserMenu] = useState<HTMLElement | null>(null);
@@ -301,6 +303,17 @@ export function Sidebar({
               <span>{isLocal ? "Local" : lib.syncStatus === "syncing" ? "Syncing…" : "Cloud Sync"}</span>
             </span>
             <span className="spacer" />
+            {onOpenShare ? (
+              <button
+                type="button"
+                className="icon-btn"
+                aria-label="Share library with friends"
+                title="Share bookmarks via link"
+                onClick={onOpenShare}
+              >
+                <Icon name="share" size={13.5} />
+              </button>
+            ) : null}
             <button
               type="button"
               className="icon-btn"
@@ -385,6 +398,16 @@ export function Sidebar({
             disabled: true,
           },
           { id: "sep1", label: "" },
+          ...(onOpenShare
+            ? [
+                {
+                  id: "share",
+                  label: "Share library…",
+                  icon: "share" as const,
+                  onSelect: onOpenShare,
+                },
+              ]
+            : []),
           {
             id: "settings",
             label: "Settings…",

@@ -188,6 +188,7 @@ export function Library({
   onNewBookmark,
   onNewCategory,
   onOpenPalette,
+  onOpenShare,
 }: {
   lib: LibraryState;
   actions: ItemActions;
@@ -195,6 +196,7 @@ export function Library({
   onNewBookmark: () => void;
   onNewCategory: () => void;
   onOpenPalette: () => void;
+  onOpenShare?: () => void;
 }) {
   const items = useMemo(() => visibleBookmarks(lib), [lib]);
   const querying = lib.query.trim().length > 0;
@@ -322,6 +324,7 @@ export function Library({
           onNewBookmark={onNewBookmark}
           onNewCategory={onNewCategory}
           onOpenPalette={onOpenPalette}
+          onOpenShare={onOpenShare}
           onTag={onTag}
         />
       </div>

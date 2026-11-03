@@ -28,6 +28,7 @@ export function DashboardOverview({
   onNewBookmark,
   onNewCategory,
   onOpenPalette,
+  onOpenShare,
   onTag,
 }: {
   lib: LibraryState;
@@ -35,6 +36,7 @@ export function DashboardOverview({
   onNewBookmark: () => void;
   onNewCategory: () => void;
   onOpenPalette: () => void;
+  onOpenShare?: () => void;
   onTag: (tag: string) => void;
 }) {
   const [selectedSugCategory, setSelectedSugCategory] = useState<string>("All");
@@ -179,6 +181,17 @@ export function DashboardOverview({
             <Icon name="folder" size={13.5} />
             <span>New collection</span>
           </button>
+          {onOpenShare ? (
+            <button
+              type="button"
+              className="btn btn-quiet"
+              onClick={onOpenShare}
+              title="Share bookmarks with friends via link"
+            >
+              <Icon name="share" size={13.5} />
+              <span>Share library</span>
+            </button>
+          ) : null}
           <button type="button" className="btn btn-primary" onClick={onNewBookmark}>
             <Icon name="plus" size={14} />
             <span>Add bookmark</span>

@@ -802,4 +802,91 @@ export function resetLibrary() {
   syncToCloud();
 }
 
+export function importSharedBookmarks(
+  items: {
+    title: string;
+    url: string;
+    description?: string;
+    categoryName?: string | null;
+    categoryColor?: string;
+    categoryIcon?: string;
+    tags?: string[];
+    favorite?: boolean;
+  }[]
+): { addedCount: number; newCategoryCount: number } {
+  if (!state.authenticated) {
+    enterLocalMode(false);
+  }
+
+  const nextCategories = [...state.categories];
+  const catByName = new Map<string, Category>();
+  for (const c of nextCategories) {
+    catByName.set(c.name.toLowerCase().trim(), c);
+  }
+
+  let newCategoryCount = 0;
+  for (const item of items) {
+    const rawCatName = item.categoryName?.trim();
+    if (rawCatName && !catByName.has(rawCatName.toLowerCase())) {
+      const created: Category = {
+        id: uid("c"),
+        userId: state.user?.id,
+        name: rawCatName,
+        icon: item.categoryIcon || "folder",
+        color: item.categoryColor || "#2563eb",
+        position: nextCategories.length * 10,
+      };
+      nextCategories.push(created);
+      catByName.set(rawCatName.toLowerCase(), created);
+      newCategoryCount++;
+    }
+  }
+
+  const now = Date.now();
+  let lowest = state.bookmarks.reduce((min, b) => Math.min(min, b.position ?? b.order), 0);
+  const newBookmarks: Bookmark[] = [];
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i]!;
+    const rawUrl = item.url.trim();
+    if (!rawUrl) continue;
+    const rawCatName = item.categoryName?.trim();
+    const matchedCat = rawCatName ? catByName.get(rawCatName.toLowerCase()) : undefined;
+    const catId = matchedCat?.id ?? null;
+    lowest -= 100;
+
+    newBookmarks.push({
+      id: uid(),
+      userId: state.user?.id,
+      title: item.title.trim() || rawUrl,
+      url: rawUrl,
+      description: (item.description || "").trim(),
+      categoryId: catId,
+      collectionId: catId,
+      tags: Array.isArray(item.tags) ? item.tags.filter(Boolean) : [],
+      favorite: Boolean(item.favorite),
+      isFavorite: Boolean(item.favorite),
+      addedAt: now - i * 100,
+      order: lowest,
+      position: lowest,
+      lastOpenedAt: null,
+    });
+  }
+
+  write({
+    categories: nextCategories,
+    collections: nextCategories,
+    bookmarks: [...newBookmarks, ...state.bookmarks],
+  });
+
+  if (isCloudSynced()) {
+    syncToCloud();
+  }
+
+  return {
+    addedCount: newBookmarks.length,
+    newCategoryCount,
+  };
+}
+
 export const deleteCollection = deleteCategory;
