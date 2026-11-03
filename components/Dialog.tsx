@@ -101,12 +101,13 @@ const GROUPS: { label: string; rows: [string[], string][] }[] = [
   {
     label: "Everywhere",
     rows: [
-      [["⌘", "K"], "Command palette"],
+      [["⌘", "K"], "Command palette (Ctrl+K on Win/Linux)"],
       [["⌘", "N"], "New bookmark"],
       [["⌘", "\\"], "Hide or show the sidebar"],
-      [["⌘", "1"], "All items"],
-      [["⌘", "2"], "Favourites"],
-      [["⌘", "3"], "Recent"],
+      [["0"], "Overview"],
+      [["1"], "All items"],
+      [["2"], "Favourites"],
+      [["3"], "Recent"],
       [["/"], "Filter this view"],
       [["?"], "This sheet"],
       [["esc"], "Clear filter, close overlay"],
@@ -117,6 +118,7 @@ const GROUPS: { label: string; rows: [string[], string][] }[] = [
     rows: [
       [["↑", "↓", "←", "→"], "Move between cards"],
       [["↵"], "Open the focused link"],
+      [["C"], "Copy focused link URL"],
       [["F"], "Toggle favourite"],
       [["E"], "Edit focused link"],
       [["⌫"], "Delete focused link"],

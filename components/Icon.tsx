@@ -53,7 +53,8 @@ export type IconName =
   | "globe"
   | "layers"
   | "copy"
-  | "checkCircle";
+  | "checkCircle"
+  | "sift";
 
 type Props = SVGProps<SVGSVGElement> & { size?: number };
 
@@ -407,6 +408,38 @@ export function Icon({ name, filled, ...rest }: Props & { name: IconName; filled
           <rect x="8.5" y="8.5" width="11" height="11" rx="1.5" />
           <path d="M5 15.5H4.5a1.5 1.5 0 01-1.5-1.5V4.5A1.5 1.5 0 014.5 3H14a1.5 1.5 0 011.5 1.5v.5" />
         </Svg>
+      );
+    case "sift":
+      return (
+        <svg
+          width={rest.size || 16}
+          height={rest.size || 16}
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            d="M12 3.25 20.25 7.9 12 12.55 3.75 7.9 12 3.25Z"
+            fill="currentColor"
+          />
+          <path
+            d="M3.75 12.6 12 17.25 20.25 12.6"
+            stroke="currentColor"
+            strokeWidth={2.1}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity={0.82}
+          />
+          <path
+            d="M3.75 16.95 12 21.6 20.25 16.95"
+            stroke="currentColor"
+            strokeWidth={2.1}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity={0.55}
+          />
+        </svg>
       );
     case "google":
       return (

@@ -92,14 +92,16 @@ export function BookmarkCard({
 
       <div className="card-foot">
         {category ? (
-          <span className="card-cat-pill" title={`Category: ${category.name}`}>
+          <span className="card-cat-pill" title={`Collection: ${category.name}`}>
             <span
               className="card-cat-dot"
               style={{ backgroundColor: category.color || "var(--accent)" }}
             />
             <span className="truncate">{category.name}</span>
           </span>
-        ) : visibleTags.map((tag) => (
+        ) : null}
+
+        {(category ? visibleTags.slice(0, 1) : visibleTags).map((tag) => (
           <button
             key={tag}
             type="button"
@@ -123,6 +125,18 @@ export function BookmarkCard({
         </span>
 
         <span className="card-actions">
+          <button
+            type="button"
+            className="icon-btn copy-btn"
+            aria-label={`Copy URL for ${bookmark.title}`}
+            title="Copy URL (C)"
+            onClick={(e) => {
+              e.stopPropagation();
+              actions.copy(bookmark);
+            }}
+          >
+            <Icon name="copy" size={12.5} />
+          </button>
           <button
             type="button"
             className={`icon-btn fav-btn${ticking ? " is-ticked" : ""}`}
@@ -243,9 +257,22 @@ export function BookmarkRow({
       <div className="row-actions">
         <button
           type="button"
+          className="icon-btn copy-btn"
+          aria-label={`Copy URL for ${bookmark.title}`}
+          title="Copy URL (C)"
+          onClick={(e) => {
+            e.stopPropagation();
+            actions.copy(bookmark);
+          }}
+        >
+          <Icon name="copy" size={12.5} />
+        </button>
+        <button
+          type="button"
           className="icon-btn fav-btn"
           aria-pressed={bookmark.favorite || bookmark.isFavorite}
           aria-label={bookmark.favorite || bookmark.isFavorite ? "Unfavourite" : "Favourite"}
+          title={bookmark.favorite || bookmark.isFavorite ? "Remove favourite (F)" : "Add favourite (F)"}
           onClick={(e) => {
             e.stopPropagation();
             actions.toggleFavorite(bookmark.id);
@@ -257,6 +284,7 @@ export function BookmarkRow({
           type="button"
           className="icon-btn more-btn"
           aria-label={`Actions for ${bookmark.title}`}
+          title="Actions"
           onClick={(e) => {
             e.stopPropagation();
             onMenu(bookmark, e.currentTarget);

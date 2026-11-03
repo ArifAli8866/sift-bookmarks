@@ -7,6 +7,7 @@ import {
   countFor,
   setPrefs,
   tagCounts,
+  toggleSidebar,
   type Category,
   type LibraryState,
   type Scope,
@@ -17,11 +18,11 @@ function categoryIcon(category: Category): IconName {
   return (category.icon as IconName) ?? FALLBACK_ICON;
 }
 
-const NAV: { kind: Scope["kind"]; label: string; icon: IconName }[] = [
-  { kind: "overview", label: "Overview", icon: "sparkle" },
-  { kind: "all", label: "All Bookmarks", icon: "bookmark" },
-  { kind: "favorites", label: "Favourites", icon: "star" },
-  { kind: "recent", label: "Recent", icon: "clock" },
+const NAV: { kind: Scope["kind"]; label: string; icon: IconName; kbd: string }[] = [
+  { kind: "overview", label: "Overview", icon: "sparkle", kbd: "0" },
+  { kind: "all", label: "All Items", icon: "inbox", kbd: "1" },
+  { kind: "favorites", label: "Favourites", icon: "star", kbd: "2" },
+  { kind: "recent", label: "Recent", icon: "clock", kbd: "3" },
 ];
 
 function NavSk({ w }: { w: number }) {
@@ -61,10 +62,9 @@ export function Sidebar({
   const [userMenu, setUserMenu] = useState<HTMLElement | null>(null);
   const [themeMenu, setThemeMenu] = useState<HTMLElement | null>(null);
   const [tagsOpen, setTagsOpen] = useState(false);
-  const [aiCardVisible, setAiCardVisible] = useState(true);
 
   const tags = useMemo(() => tagCounts(lib), [lib]);
-  const shownTags = tagsOpen ? tags : tags.slice(0, 5);
+  const shownTags = tagsOpen ? tags : tags.slice(0, 6);
 
   const isCurrent = (scope: Scope) =>
     scope.kind === lib.scope.kind && (scope.id ?? undefined) === (lib.scope.id ?? undefined);
@@ -79,13 +79,13 @@ export function Sidebar({
     { id: "sep", label: "" },
     {
       id: "edit",
-      label: "Edit category…",
+      label: "Edit collection…",
       icon: "pencil",
       onSelect: () => onEditCategory(category),
     },
     {
       id: "delete",
-      label: "Delete category…",
+      label: "Delete collection…",
       icon: "trash",
       danger: true,
       onSelect: () => onDeleteCategory(category),
@@ -93,20 +93,39 @@ export function Sidebar({
   ];
 
   const userInitial = (lib.user?.name || "D")[0]?.toUpperCase() || "D";
+  const isLocal = lib.syncStatus === "local";
+  const themeIcon: IconName =
+    lib.prefs.theme === "light" ? "sun" : lib.prefs.theme === "dark" ? "moon" : "auto";
 
   return (
-    <aside className="sidebar" aria-label="Library">
+    <aside className="sidebar" aria-label="Library navigation">
       <div className="sidebar-inner">
         {/* Brand */}
         <div className="brand">
-          <span className="brand-mark" aria-hidden="true">
-            <Icon name="bookmark" size={15} />
-          </span>
-          <div className="brand-text">
-            <span className="brand-name">Sift</span>
-            <span className="brand-sub">Bookmarks</span>
-          </div>
+          <button
+            type="button"
+            className="brand-home"
+            onClick={() => onScope({ kind: "overview" })}
+            title="Sift — Overview (0)"
+          >
+            <span className="brand-mark" aria-hidden="true">
+              <Icon name="sift" size={16} />
+            </span>
+            <span className="brand-text">
+              <span className="brand-name">Sift</span>
+              <span className="brand-sub">Developer Library</span>
+            </span>
+          </button>
           <span className="spacer" />
+          <button
+            type="button"
+            className="icon-btn brand-collapse-btn"
+            aria-label="Collapse sidebar"
+            title="Toggle sidebar (⌘\)"
+            onClick={toggleSidebar}
+          >
+            <Icon name="sidebar" size={14} />
+          </button>
           <button
             type="button"
             className="brand-quick-btn"
@@ -119,10 +138,10 @@ export function Sidebar({
         </div>
 
         <div className="sidebar-scroll scroll">
-          {/* Main Navigation */}
-          <nav className="nav-section">
+          {/* Library Navigation */}
+          <nav className="nav-section" aria-label="Library">
             <div className="nav-head">
-              <span className="nav-head-label">Workspace</span>
+              <span className="nav-head-label">Library</span>
             </div>
             {NAV.map((item) => {
               const count = countFor(lib, { kind: item.kind });
@@ -133,6 +152,7 @@ export function Sidebar({
                   className="nav-row"
                   aria-current={isCurrent({ kind: item.kind }) ? "page" : undefined}
                   onClick={() => onScope({ kind: item.kind })}
+                  title={`${item.label} (${item.kbd})`}
                 >
                   <Icon name={item.icon} size={15} className="nav-icon" />
                   <span className="nav-label truncate">{item.label}</span>
@@ -146,15 +166,15 @@ export function Sidebar({
             })}
           </nav>
 
-          {/* User Categories */}
-          <nav className="nav-section">
+          {/* Collections / Categories */}
+          <nav className="nav-section" aria-label="Collections">
             <div className="nav-head">
-              <span className="nav-head-label">Your Categories</span>
+              <span className="nav-head-label">Collections</span>
               <button
                 type="button"
                 className="icon-btn"
-                aria-label="Create category"
-                title="Create category"
+                aria-label="Create collection"
+                title="New collection"
                 onClick={onNewCategory}
               >
                 <Icon name="plus" size={13} />
@@ -179,7 +199,8 @@ export function Sidebar({
                 className="nav-row is-empty-state"
                 onClick={onNewCategory}
               >
-                <span className="nav-label">+ Add your first category</span>
+                <Icon name="plus" size={13} className="nav-icon" />
+                <span className="nav-label">New collection…</span>
               </button>
             ) : (
               lib.categories.map((category) => {
@@ -201,13 +222,16 @@ export function Sidebar({
                       className="nav-cat-dot"
                       style={{ backgroundColor: category.color || "var(--accent)" }}
                     />
-                    <Icon name={categoryIcon(category)} size={15} className="nav-icon" />
+                    <Icon name={categoryIcon(category)} size={14} className="nav-icon" />
                     <span className="nav-label truncate">{category.name}</span>
                     <span
                       className="nav-more"
                       role="button"
                       tabIndex={-1}
-                      aria-hidden="true"
+                      aria-label={`Actions for ${category.name}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
                       onPointerDown={(e) => {
                         e.stopPropagation();
                         setMenuFor({ anchor: e.currentTarget, id: category.id });
@@ -224,7 +248,7 @@ export function Sidebar({
 
           {/* Tags */}
           {shownTags.length ? (
-            <nav className="nav-section">
+            <nav className="nav-section" aria-label="Tags">
               <div className="nav-head">
                 <span className="nav-head-label">Tags</span>
               </div>
@@ -236,12 +260,12 @@ export function Sidebar({
                   aria-current={isCurrent({ kind: "tag", id: tag }) ? "page" : undefined}
                   onClick={() => onScope({ kind: "tag", id: tag })}
                 >
-                  <Icon name="tag" size={14} className="nav-icon" />
+                  <Icon name="tag" size={13.5} className="nav-icon" />
                   <span className="nav-label truncate">#{tag}</span>
                   <span className="nav-count t-num">{count}</span>
                 </button>
               ))}
-              {tags.length > 5 ? (
+              {tags.length > 6 ? (
                 <button
                   type="button"
                   className="nav-row nav-row-disclose"
@@ -257,44 +281,62 @@ export function Sidebar({
           ) : null}
         </div>
 
-        {/* AI Assistant card widget inspired by SaaS dashboard reference */}
-        {aiCardVisible ? (
-          <div className="sidebar-ai-card">
-            <div className="ai-card-head">
-              <div className="ai-card-badge">
-                <Icon name="sparkle" size={13} />
-                <span>AI Assistant</span>
-              </div>
-              <button
-                type="button"
-                className="ai-card-close"
-                aria-label="Dismiss AI Assistant tip"
-                onClick={() => setAiCardVisible(false)}
-              >
-                <Icon name="close" size={12} />
-              </button>
-            </div>
-            <p className="ai-card-desc">
-              Auto-enrich links, discover smart tags, and find shortcuts effortlessly.
-            </p>
+        {/* Footer: Storage status, User profile & quick toggles */}
+        <div className="sidebar-foot">
+          <div className="sidebar-status-row">
+            <span
+              className="sidebar-storage-badge"
+              data-status={lib.syncStatus}
+              title={
+                isLocal
+                  ? "Bookmarks are saved locally in this browser"
+                  : lib.syncStatus === "syncing"
+                  ? "Syncing with cloud database…"
+                  : lib.syncStatus === "error"
+                  ? "Sync error — check connection"
+                  : "Synced with cloud database"
+              }
+            >
+              <span className="sidebar-storage-dot" aria-hidden="true" />
+              <span>{isLocal ? "Local" : lib.syncStatus === "syncing" ? "Syncing…" : "Cloud Sync"}</span>
+            </span>
+            <span className="spacer" />
             <button
               type="button"
-              className="ai-card-btn"
-              onClick={() => onOpenPalette?.()}
+              className="icon-btn"
+              aria-label={`Appearance (${lib.prefs.theme})`}
+              title={`Theme: ${lib.prefs.theme}`}
+              onClick={(e) => setThemeMenu(e.currentTarget)}
             >
-              <span>Explore AI Search</span>
-              <Icon name="chevronRight" size={12} />
+              <Icon name={themeIcon} size={14} />
             </button>
+            <button
+              type="button"
+              className="icon-btn"
+              aria-label="Keyboard shortcuts"
+              title="Keyboard shortcuts (?)"
+              onClick={onShowShortcuts}
+            >
+              <Icon name="keyboard" size={14} />
+            </button>
+            {onOpenPalette ? (
+              <button
+                type="button"
+                className="icon-btn"
+                aria-label="Command palette"
+                title="Command palette (⌘K)"
+                onClick={onOpenPalette}
+              >
+                <Icon name="command" size={13.5} />
+              </button>
+            ) : null}
           </div>
-        ) : null}
 
-        {/* Footer: User profile & quick toggles */}
-        <div className="sidebar-foot">
           <button
             type="button"
             className="sidebar-user-pill"
             aria-label="User profile & settings"
-            title="User profile & settings"
+            title="Account & workspace settings"
             onClick={(e) => setUserMenu(e.currentTarget)}
           >
             <div className="sidebar-avatar">
@@ -310,7 +352,7 @@ export function Sidebar({
                 {lib.user?.name || "Developer"}
               </span>
               <span className="sidebar-user-sub truncate">
-                {lib.user?.email || "Workspace"}
+                {lib.user?.email || (isLocal ? "Stored in browser" : "Workspace")}
               </span>
             </div>
             <Icon name="chevronUp" size={12} className="sidebar-user-arrow" />
@@ -369,9 +411,9 @@ export function Sidebar({
           { id: "sep2", label: "" },
           {
             id: "logout",
-            label: "Sign out",
+            label: isLocal ? "Exit local mode / Sign in…" : "Sign out",
             icon: "logout",
-            danger: true,
+            danger: !isLocal,
             onSelect: onLogout,
           },
         ]}

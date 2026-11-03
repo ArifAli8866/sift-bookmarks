@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <defs>
+    <linearGradient id="sift-bg" x1="8" y1="4" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1E1B4B" />
+      <stop offset="55%" stop-color="#131424" />
+      <stop offset="100%" stop-color="#090A10" />
+    </linearGradient>
+    <radialGradient id="sift-glow" cx="24" cy="14" r="34" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6366F1" stop-opacity="0.38" />
+      <stop offset="100%" stop-color="#6366F1" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="sift-top" x1="16" y1="13" x2="48" y2="33" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#E0E7FF" />
+    </linearGradient>
+    <linearGradient id="sift-mid" x1="14" y1="33" x2="50" y2="43" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#C7D2FE" />
+      <stop offset="100%" stop-color="#818CF8" />
+    </linearGradient>
+    <linearGradient id="sift-bot" x1="14" y1="42" x2="50" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#818CF8" />
+      <stop offset="100%" stop-color="#6366F1" />
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#sift-bg)" />
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#sift-glow)" />
+  <rect x="2.75" y="2.75" width="58.5" height="58.5" rx="13.25" stroke="#818CF8" stroke-opacity="0.32" stroke-width="1.5" />
+  <path d="M32 13.5 49.5 23.25 32 33 14.5 23.25 32 13.5Z" fill="url(#sift-top)" />
+  <path d="M14.5 32.75 32 42.5 49.5 32.75" stroke="url(#sift-mid)" stroke-width="4.75" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M14.5 42.25 32 52 49.5 42.25" stroke="url(#sift-bot)" stroke-width="4.75" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

@@ -63,27 +63,26 @@ export function Toolbar({
       <div className="toolbar-title-group">
         <div className="toolbar-title">
           <h1 className="t-title toolbar-name">
-            <span className="truncate">{title}</span>
+            <span className="truncate">{querying && lib.scope.kind === "overview" ? "Search Results" : title}</span>
           </h1>
           <span className="toolbar-metric-pill t-num" aria-live="polite">
-            {querying && shown !== total ? `${shown} of ${total}` : `${shown} bookmarks`}
+            {querying && shown !== total
+              ? `${shown} of ${total}`
+              : `${shown} ${shown === 1 ? "item" : "items"}`}
           </span>
-        </div>
-        <div className="toolbar-sub">
-          <span className="truncate">Developer Workspace • Fast Access</span>
         </div>
       </div>
 
       <div className="toolbar-actions">
-        <label className="search">
+        <label className="search" title="Filter bookmarks (/) · Command palette (⌘K / Ctrl+K)">
           <Icon name="search" size={13} className="search-icon" />
           <input
             ref={searchRef}
             type="text"
             role="searchbox"
             value={lib.query}
-            placeholder="Filter"
-            aria-label="Filter items in this view"
+            placeholder="Filter bookmarks…"
+            aria-label="Filter bookmarks"
             spellCheck={false}
             autoComplete="off"
             onChange={(e) => setQuery(e.target.value)}
@@ -94,7 +93,7 @@ export function Toolbar({
                 if (lib.query) setQuery("");
                 else e.currentTarget.blur();
               }
-              if (e.key === "Enter") {
+              if (e.key === "Enter" && !lib.query.trim()) {
                 e.preventDefault();
                 onOpenPalette();
               }
@@ -116,9 +115,20 @@ export function Toolbar({
               </svg>
             </button>
           ) : (
-            <kbd aria-hidden="true">⌘K</kbd>
+            <kbd aria-hidden="true">/</kbd>
           )}
         </label>
+
+        <button
+          type="button"
+          className="btn btn-quiet toolbar-palette-btn"
+          aria-label="Open command palette"
+          title="Command Palette (⌘K / Ctrl+K)"
+          onClick={onOpenPalette}
+        >
+          <Icon name="command" size={13} />
+          <kbd aria-hidden="true">⌘K</kbd>
+        </button>
 
         <button
           type="button"

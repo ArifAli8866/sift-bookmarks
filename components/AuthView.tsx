@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Icon } from "./Icon";
-import { loginUser, registerUser, loginWithGoogle } from "../lib/store";
+import { enterLocalMode, loginUser, registerUser, loginWithGoogle } from "../lib/store";
 import { pushToast } from "../lib/toast";
 
 export function AuthView() {
@@ -153,7 +153,7 @@ export function AuthView() {
         <div className="auth-header">
           <div className="auth-brand">
             <span className="auth-brand-mark">
-              <Icon name="bookmark" size={16} />
+              <Icon name="sift" size={17} />
             </span>
             <span className="auth-brand-name">Sift</span>
           </div>
@@ -167,7 +167,7 @@ export function AuthView() {
           </p>
         </div>
 
-        {/* Continue with Google */}
+        {/* Continue with Google or Local Storage */}
         <div className="auth-social">
           <button
             type="button"
@@ -177,6 +177,18 @@ export function AuthView() {
           >
             <Icon name="google" size={18} />
             <span>{googleLoading ? "Connecting to Google…" : "Continue with Google"}</span>
+          </button>
+          <button
+            type="button"
+            className="auth-local-btn"
+            disabled={googleLoading || loading}
+            onClick={() => {
+              enterLocalMode(true);
+              pushToast("Opened Local Workspace (saved in browser)");
+            }}
+          >
+            <Icon name="database" size={15} />
+            <span>Continue in Local Mode (No Account Needed)</span>
           </button>
         </div>
 

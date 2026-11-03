@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   devIndicators: false,
   poweredByHeader: false,
+  serverExternalPackages: ["@electric-sql/pglite"],
   // The preview is served through a proxied host; allow it for dev tooling.
   allowedDevOrigins: ["*.e2b.app", "*.trycloudflare.com"],
 };

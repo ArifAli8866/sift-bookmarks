@@ -6,7 +6,7 @@ import { Icon, type IconName } from "./Icon";
 import { Favicon } from "./Favicon";
 import { fuzzy, segments, type Range } from "../lib/match";
 import { domainOf } from "../lib/format";
-import { setPrefs, syncToCloud, type Bookmark, type LibraryState, type Scope } from "../lib/store";
+import { markBookmarkOpened, setPrefs, type Bookmark, type LibraryState, type Scope } from "../lib/store";
 import { pushToast } from "../lib/toast";
 
 type RowKind = "bookmark" | "collection" | "tag" | "action";
@@ -72,7 +72,10 @@ export function CommandPalette({
     const q = query.trim();
     const out: Row[] = [];
 
-    const openLink = (b: Bookmark) => () => window.open(b.url, "_blank", "noopener,noreferrer");
+    const openLink = (b: Bookmark) => () => {
+      markBookmarkOpened(b.id);
+      window.open(b.url, "_blank", "noopener,noreferrer");
+    };
 
     const scoreBookmark = (b: Bookmark) => {
       const host = domainOf(b.url);
@@ -135,10 +138,10 @@ export function CommandPalette({
 
     const scoreCollection = (name: string) => (q ? fuzzy(q, name) : { score: 0, ranges: [] as Range[] });
     if (q ? out.length < 10 : true) {
-      for (const c of lib.collections) {
+      for (const c of lib.categories) {
         const hit = scoreCollection(c.name);
         if (q && !hit) continue;
-        const count = lib.bookmarks.filter((b) => b.collectionId === c.id).length;
+        const count = lib.bookmarks.filter((b) => (b.categoryId || b.collectionId) === c.id).length;
         out.push({
           id: `col-${c.id}`,
           group: q ? "Collections" : "Jump to",
@@ -147,7 +150,7 @@ export function CommandPalette({
           sub: `${count}`,
           icon: (c.icon as IconName) ?? "folder",
           action: "→ go",
-          run: () => onScope({ kind: "collection", id: c.id }),
+          run: () => onScope({ kind: "category", id: c.id }),
           score: (hit?.score ?? 0) * 0.94,
           ranges: hit?.ranges ?? [],
           labelRanges: hit?.ranges ?? [],
@@ -372,10 +375,34 @@ export function CommandPalette({
       <div className="palette-list scroll" id="palette-list" ref={listRef} role="listbox" aria-label="Results">
         {displayRows.length === 0 ? (
           <div className="palette-empty">
-            <Icon name="search" size={15} />
+            <Icon name="search" size={16} />
             <span>
-              Nothing matches “{query.trim()}”.
+              No results matching “{query.trim()}”.
             </span>
+            <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+              <button
+                type="button"
+                className="btn btn-sm"
+                onClick={() => {
+                  setQuery("");
+                  setFilter("all");
+                  inputRef.current?.focus();
+                }}
+              >
+                Clear search
+              </button>
+              <button
+                type="button"
+                className="btn btn-sm btn-primary"
+                onClick={() => {
+                  onClose();
+                  onNewBookmark();
+                }}
+              >
+                <Icon name="plus" size={12} />
+                <span>New bookmark</span>
+              </button>
+            </div>
           </div>
         ) : (
           grouped.map((group) => (

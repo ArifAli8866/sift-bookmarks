@@ -1,16 +1,19 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Icon } from "./Icon";
+import { Icon, type IconName } from "./Icon";
 import { Favicon } from "./Favicon";
-import { BookmarkCard, BookmarkRow } from "./BookmarkCard";
-import { EmptyState } from "./EmptyState";
+import { BookmarkCard } from "./BookmarkCard";
 import { Menu } from "./Menu";
 import { SUGGESTED_BOOKMARKS } from "../lib/suggestions";
 import {
   addBookmark,
+  countFor,
+  deleteBookmarks,
+  loadStarterBookmarks,
+  markBookmarkOpened,
+  restoreBookmarks,
   setScope,
-  setQuery,
   type Bookmark,
   type Category,
   type LibraryState,
@@ -38,7 +41,7 @@ export function DashboardOverview({
   const [addedSuggestions, setAddedSuggestions] = useState<Set<string>>(new Set());
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const [menu, setMenu] = useState<{ anchor: HTMLElement; bookmark: Bookmark } | null>(null);
-  const [overviewView, setOverviewView] = useState<"table" | "grid">("table");
+  const [overviewView, setOverviewView] = useState<"grid" | "table">("grid");
   const [selectedBookmarkIds, setSelectedBookmarkIds] = useState<Set<string>>(new Set());
 
   // Dynamic greeting based on current time
@@ -51,50 +54,32 @@ export function DashboardOverview({
 
   const userName = lib.user?.name ? lib.user.name.split(" ")[0] : "Developer";
 
-  // Summary counts
+  // Real library summary metrics (zero fake numbers)
   const totalCount = lib.bookmarks.length;
-  const favCount = lib.bookmarks.filter((b) => b.favorite || b.isFavorite).length;
+  const favBookmarks = useMemo(
+    () => lib.bookmarks.filter((b) => b.favorite || b.isFavorite),
+    [lib.bookmarks]
+  );
+  const favCount = favBookmarks.length;
   const catCount = lib.categories.length;
-  const recentCount = lib.bookmarks.filter((b) => {
-    const ts = b.lastOpenedAt || b.addedAt;
-    return Date.now() - ts < 1000 * 60 * 60 * 24 * 7;
-  }).length;
+  const categorizedCount = useMemo(
+    () => lib.bookmarks.filter((b) => Boolean(b.categoryId || b.collectionId)).length,
+    [lib.bookmarks]
+  );
+  const recentCount = useMemo(
+    () =>
+      lib.bookmarks.filter((b) => {
+        const ts = b.lastOpenedAt || b.addedAt;
+        return Date.now() - ts < 1000 * 60 * 60 * 24 * 7;
+      }).length,
+    [lib.bookmarks]
+  );
 
   const categoryMap = useMemo(() => {
     const map = new Map<string, Category>();
     for (const c of lib.categories) map.set(c.id, c);
     return map;
   }, [lib.categories]);
-
-  // Weekly activity distribution (Mon - Sun) inspired by ref4/ref5
-  const weeklyData = useMemo(() => {
-    const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    const now = new Date();
-    const currentDayIndex = (now.getDay() + 6) % 7; // 0 = Mon, 6 = Sun
-    const counts: number[] = [0, 0, 0, 0, 0, 0, 0];
-    for (const b of lib.bookmarks) {
-      const ts = b.lastOpenedAt || b.addedAt;
-      const d = new Date(ts);
-      const diffDays = Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
-      if (diffDays >= 0 && diffDays < 7) {
-        const dayIdx = (d.getDay() + 6) % 7;
-        const currentCount = counts[dayIdx] ?? 0;
-        counts[dayIdx] = currentCount + 1;
-      }
-    }
-    const baselines: number[] = [4, 7, 5, 3, 2, 1, 0];
-    return days.map((day, i) => {
-      const countVal = counts[i] ?? 0;
-      const baselineVal = baselines[i] ?? 0;
-      const total = countVal + (lib.bookmarks.length > 0 ? baselineVal : 0);
-      return {
-        day,
-        count: total,
-        isToday: i === currentDayIndex,
-        percentage: Math.min(100, Math.max(16, total * 12)),
-      };
-    });
-  }, [lib.bookmarks]);
 
   // Suggestions filtered by active category tab
   const filteredSuggestions = useMemo(() => {
@@ -105,7 +90,6 @@ export function DashboardOverview({
   }, [selectedSugCategory]);
 
   const handleAddSuggestion = (sug: (typeof SUGGESTED_BOOKMARKS)[0]) => {
-    // Determine category ID if matched with user's custom categories
     const matchingCat = lib.categories.find(
       (c) => c.name.toLowerCase() === sug.category.toLowerCase()
     );
@@ -123,20 +107,47 @@ export function DashboardOverview({
     pushToast(`Added “${sug.title}” to your library`);
   };
 
+  const handleBulkDelete = () => {
+    const ids = Array.from(selectedBookmarkIds);
+    if (!ids.length) return;
+    const removed = deleteBookmarks(ids);
+    setSelectedBookmarkIds(new Set());
+    if (removed.length) {
+      pushToast(`Deleted ${removed.length} bookmark${removed.length === 1 ? "" : "s"}`, {
+        action: {
+          label: "Undo",
+          onClick: () => {
+            restoreBookmarks(removed);
+            pushToast("Restored bookmarks");
+          },
+        },
+      });
+    }
+  };
+
   return (
     <div className="dashboard-wrap">
-      {/* 1. Header Greeting */}
+      {/* 1. Compact Header Greeting */}
       <section className="dashboard-greeting-bar">
         <div className="dashboard-greeting-text">
           <h2 className="dashboard-greeting-title">
-            {greeting}, {userName} 👋
+            {greeting}, {userName}
           </h2>
-          <p className="dashboard-greeting-subtitle">Your personal developer toolbox.</p>
+          <p className="dashboard-greeting-subtitle">
+            {totalCount > 0
+              ? `${totalCount} saved link${totalCount === 1 ? "" : "s"} across ${catCount} collection${catCount === 1 ? "" : "s"}`
+              : "Your keyboard-first developer bookmark library."}
+          </p>
         </div>
         <div className="dashboard-greeting-actions">
-          <button type="button" className="btn btn-quiet" onClick={onOpenPalette} title="Cmd+K">
-            <Icon name="search" size={14} />
-            <span>Search (⌘K)</span>
+          <button type="button" className="btn" onClick={onOpenPalette} title="Command Palette (⌘K)">
+            <Icon name="search" size={13.5} />
+            <span>Jump to…</span>
+            <kbd>⌘K</kbd>
+          </button>
+          <button type="button" className="btn" onClick={onNewCategory}>
+            <Icon name="folder" size={13.5} />
+            <span>New collection</span>
           </button>
           <button type="button" className="btn btn-primary" onClick={onNewBookmark}>
             <Icon name="plus" size={14} />
@@ -152,20 +163,25 @@ export function DashboardOverview({
           role="button"
           tabIndex={0}
           onClick={() => setScope({ kind: "all" })}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setScope({ kind: "all" });
+            }
+          }}
         >
           <div className="stat-card-top">
             <div className="stat-card-icon-box stat-icon-blue">
-              <Icon name="bookmark" size={18} />
+              <Icon name="inbox" size={16} />
             </div>
-            <span className="stat-trend-pill trend-blue">All Saved</span>
+            <span className="stat-trend-pill trend-blue">All Items</span>
           </div>
           <div className="stat-card-content">
             <div className="stat-card-value t-num">{totalCount}</div>
             <div className="stat-card-label">Total Bookmarks</div>
-            <div className="stat-card-meta">Active in library</div>
-          </div>
-          <div className="stat-card-bar-wrap">
-            <div className="stat-card-bar bar-blue" style={{ width: "100%" }} />
+            <div className="stat-card-meta">
+              {totalCount > 0 ? `${categorizedCount} organized in collections` : "No bookmarks yet"}
+            </div>
           </div>
         </div>
 
@@ -174,10 +190,16 @@ export function DashboardOverview({
           role="button"
           tabIndex={0}
           onClick={() => setScope({ kind: "favorites" })}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setScope({ kind: "favorites" });
+            }
+          }}
         >
           <div className="stat-card-top">
             <div className="stat-card-icon-box stat-icon-amber">
-              <Icon name="star" size={18} filled />
+              <Icon name="star" size={16} filled />
             </div>
             <span className="stat-trend-pill trend-amber">Pinned</span>
           </div>
@@ -185,16 +207,8 @@ export function DashboardOverview({
             <div className="stat-card-value t-num">{favCount}</div>
             <div className="stat-card-label">Favourites</div>
             <div className="stat-card-meta">
-              {totalCount > 0 ? `${Math.round((favCount / totalCount) * 100)}% of total` : "Quick access"}
+              {totalCount > 0 ? `${Math.round((favCount / totalCount) * 100)}% of library` : "Star links for quick access"}
             </div>
-          </div>
-          <div className="stat-card-bar-wrap">
-            <div
-              className="stat-card-bar bar-amber"
-              style={{
-                width: `${totalCount ? Math.min(100, Math.round((favCount / totalCount) * 100)) : 0}%`,
-              }}
-            />
           </div>
         </div>
 
@@ -202,24 +216,33 @@ export function DashboardOverview({
           className="dashboard-stat-card"
           role="button"
           tabIndex={0}
-          onClick={() => onNewCategory()}
+          onClick={() => {
+            if (lib.categories[0]) {
+              setScope({ kind: "category", id: lib.categories[0].id });
+            } else {
+              onNewCategory();
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              if (lib.categories[0]) setScope({ kind: "category", id: lib.categories[0].id });
+              else onNewCategory();
+            }
+          }}
         >
           <div className="stat-card-top">
             <div className="stat-card-icon-box stat-icon-purple">
-              <Icon name="folder" size={18} />
+              <Icon name="folder" size={16} />
             </div>
-            <span className="stat-trend-pill trend-purple">Stacks</span>
+            <span className="stat-trend-pill trend-purple">Collections</span>
           </div>
           <div className="stat-card-content">
             <div className="stat-card-value t-num">{catCount}</div>
-            <div className="stat-card-label">Categories</div>
-            <div className="stat-card-meta">Custom collections</div>
-          </div>
-          <div className="stat-card-bar-wrap">
-            <div
-              className="stat-card-bar bar-purple"
-              style={{ width: `${Math.min(100, catCount * 25)}%` }}
-            />
+            <div className="stat-card-label">Collections</div>
+            <div className="stat-card-meta">
+              {catCount > 0 ? "Click to browse collections" : "Create your first collection"}
+            </div>
           </div>
         </div>
 
@@ -228,254 +251,75 @@ export function DashboardOverview({
           role="button"
           tabIndex={0}
           onClick={() => setScope({ kind: "recent" })}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setScope({ kind: "recent" });
+            }
+          }}
         >
           <div className="stat-card-top">
             <div className="stat-card-icon-box stat-icon-emerald">
-              <Icon name="clock" size={18} />
+              <Icon name="clock" size={16} />
             </div>
-            <span className="stat-trend-pill trend-emerald">This Week</span>
+            <span className="stat-trend-pill trend-emerald">7 Days</span>
           </div>
           <div className="stat-card-content">
             <div className="stat-card-value t-num">{recentCount}</div>
-            <div className="stat-card-label">Recent Links</div>
-            <div className="stat-card-meta">Visited in last 7 days</div>
-          </div>
-          <div className="stat-card-bar-wrap">
-            <div
-              className="stat-card-bar bar-emerald"
-              style={{
-                width: `${totalCount ? Math.min(100, Math.round((recentCount / totalCount) * 100)) : 0}%`,
-              }}
-            />
+            <div className="stat-card-label">Recent Activity</div>
+            <div className="stat-card-meta">Added or opened this week</div>
           </div>
         </div>
       </section>
 
-      {/* 3. Quick Actions Row */}
-      <section className="dashboard-quick-actions" aria-label="Quick actions">
-        <div className="quick-actions-label">
-          <Icon name="sparkle" size={14} />
-          <span>Quick actions</span>
-        </div>
-        <div className="quick-actions-btns">
-          <button type="button" className="quick-action-btn" onClick={onNewBookmark}>
-            <Icon name="plus" size={13} />
-            <span>Add Bookmark</span>
-          </button>
-          <button type="button" className="quick-action-btn" onClick={onNewCategory}>
-            <Icon name="folder" size={13} />
-            <span>Create Category</span>
-          </button>
-          <button type="button" className="quick-action-btn" onClick={onOpenPalette}>
-            <Icon name="command" size={13} />
-            <span>Command Palette</span>
-          </button>
-        </div>
-      </section>
-
-      {/* 3.5 SaaS Activity Analytics & Insights (inspired by ref4/ref5) */}
-      <section className="dashboard-analytics-section" aria-label="Usage analytics">
-        <div className="dashboard-analytics-layout">
-          {/* Left Column: Weekly Activity Bar Chart */}
-          <div className="activity-card">
-            <div className="activity-card-header">
-              <div>
-                <div className="activity-card-title-row">
-                  <h3 className="activity-card-title">Weekly Activity</h3>
-                  <span className="activity-count-pill">{recentCount} this week</span>
-                </div>
-                <p className="activity-card-subtitle">
-                  Link visits and interactions across the past 7 days
-                </p>
-              </div>
-              <div className="activity-status-pill">
-                <span className="activity-pulse-dot" />
-                <span>Realtime Stats</span>
-              </div>
+      {/* 3. Collections Strip (when user has collections) */}
+      {lib.categories.length > 0 ? (
+        <section className="dashboard-collections-section" aria-label="Collections">
+          <div className="dashboard-section-header">
+            <div className="dashboard-section-title">
+              <span>Collections</span>
+              <span className="count-badge t-num">{lib.categories.length}</span>
             </div>
-
-            <div className="activity-bars-grid">
-              {weeklyData.map((item) => (
-                <div
-                  key={item.day}
-                  className={`activity-bar-col ${item.isToday ? "is-current-day" : ""}`}
+            <span className="spacer" />
+            <button type="button" className="btn btn-sm btn-quiet" onClick={onNewCategory}>
+              <Icon name="plus" size={12} />
+              <span>New collection</span>
+            </button>
+          </div>
+          <div className="dashboard-collections-grid">
+            {lib.categories.map((cat) => {
+              const count = countFor(lib, { kind: "category", id: cat.id });
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  className="dashboard-collection-card"
+                  onClick={() => setScope({ kind: "category", id: cat.id })}
                 >
-                  <span className="activity-bar-value t-num">{item.count}</span>
-                  <div className="activity-bar-track">
-                    <div
-                      className="activity-bar-fill"
-                      style={{ height: `${item.percentage}%` }}
-                    />
-                  </div>
-                  <span className="activity-bar-label">{item.day}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Right Column: Circular Progress Rings & Dark Productivity Card */}
-          <div className="dashboard-side-col">
-            <div className="progress-rings-card">
-              <div className="activity-card-header">
-                <div>
-                  <h3 className="activity-card-title">Library Health</h3>
-                  <p className="activity-card-subtitle">Organization & tag coverage</p>
-                </div>
-                <span className="count-badge t-num">{totalCount} items</span>
-              </div>
-
-              <div className="progress-rings-row">
-                <div className="progress-ring-item">
-                  <div className="progress-ring-circle-wrap">
-                    <svg height={68} width={68} className="progress-ring-svg">
-                      <circle
-                        stroke="var(--surface-sunken)"
-                        fill="transparent"
-                        strokeWidth={6}
-                        r={28}
-                        cx={34}
-                        cy={34}
-                      />
-                      <circle
-                        stroke="#8b5cf6"
-                        fill="transparent"
-                        strokeWidth={6}
-                        strokeDasharray={`${2 * Math.PI * 28}`}
-                        style={{
-                          strokeDashoffset:
-                            2 * Math.PI * 28 - (0.64 * 2 * Math.PI * 28),
-                        }}
-                        strokeLinecap="round"
-                        r={28}
-                        cx={34}
-                        cy={34}
-                        className="progress-ring-fill"
-                      />
-                    </svg>
-                    <span className="progress-ring-text t-num">64%</span>
-                  </div>
-                  <span className="progress-ring-label">Activity</span>
-                </div>
-
-                <div className="progress-ring-item">
-                  <div className="progress-ring-circle-wrap">
-                    <svg height={68} width={68} className="progress-ring-svg">
-                      <circle
-                        stroke="var(--surface-sunken)"
-                        fill="transparent"
-                        strokeWidth={6}
-                        r={28}
-                        cx={34}
-                        cy={34}
-                      />
-                      <circle
-                        stroke="#2563eb"
-                        fill="transparent"
-                        strokeWidth={6}
-                        strokeDasharray={`${2 * Math.PI * 28}`}
-                        style={{
-                          strokeDashoffset:
-                            2 * Math.PI * 28 -
-                            ((totalCount
-                              ? Math.min(1, lib.bookmarks.filter((b) => b.categoryId).length / totalCount || 0.85)
-                              : 0.85) *
-                              2 *
-                              Math.PI *
-                              28),
-                        }}
-                        strokeLinecap="round"
-                        r={28}
-                        cx={34}
-                        cy={34}
-                        className="progress-ring-fill"
-                      />
-                    </svg>
-                    <span className="progress-ring-text t-num">
-                      {totalCount
-                        ? Math.min(100, Math.round((lib.bookmarks.filter((b) => b.categoryId).length / totalCount) * 100) || 85)
-                        : 85}
-                      %
+                  <span
+                    className="dashboard-collection-icon"
+                    style={{
+                      backgroundColor: cat.color ? `${cat.color}18` : "var(--accent-soft)",
+                      color: cat.color || "var(--accent)",
+                    }}
+                  >
+                    <Icon name={(cat.icon as IconName) || "folder"} size={15} />
+                  </span>
+                  <span className="dashboard-collection-info truncate">
+                    <span className="dashboard-collection-name truncate">{cat.name}</span>
+                    <span className="dashboard-collection-count t-num">
+                      {count} {count === 1 ? "item" : "items"}
                     </span>
-                  </div>
-                  <span className="progress-ring-label">Organized</span>
-                </div>
-
-                <div className="progress-ring-item">
-                  <div className="progress-ring-circle-wrap">
-                    <svg height={68} width={68} className="progress-ring-svg">
-                      <circle
-                        stroke="var(--surface-sunken)"
-                        fill="transparent"
-                        strokeWidth={6}
-                        r={28}
-                        cx={34}
-                        cy={34}
-                      />
-                      <circle
-                        stroke="#06b6d4"
-                        fill="transparent"
-                        strokeWidth={6}
-                        strokeDasharray={`${2 * Math.PI * 28}`}
-                        style={{
-                          strokeDashoffset:
-                            2 * Math.PI * 28 - (0.92 * 2 * Math.PI * 28),
-                        }}
-                        strokeLinecap="round"
-                        r={28}
-                        cx={34}
-                        cy={34}
-                        className="progress-ring-fill"
-                      />
-                    </svg>
-                    <span className="progress-ring-text t-num">92%</span>
-                  </div>
-                  <span className="progress-ring-label">Tagged</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Dark Accent Productivity Card & Achievements */}
-            <div className="analytics-duo-row">
-              <div className="dark-productivity-card">
-                <div className="dark-card-head">
-                  <span className="dark-card-title">Productivity</span>
-                  <span className="dark-card-pill">Per month</span>
-                </div>
-                <div className="dark-card-metrics">
-                  <div className="dark-metric-item">
-                    <div className="dark-metric-val t-num">{catCount}+</div>
-                    <div className="dark-metric-lbl">Stacks</div>
-                  </div>
-                  <div className="dark-metric-item">
-                    <div className="dark-metric-val t-num">{recentCount}+</div>
-                    <div className="dark-metric-lbl">Reads</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="achievements-mini-card">
-                <span className="achieve-title">Developer Badges</span>
-                <div className="achieve-icons-grid">
-                  <div className="achieve-icon-box achieve-blue" title="Active Explorer">
-                    <Icon name="sparkle" size={16} />
-                  </div>
-                  <div className="achieve-icon-box achieve-purple" title="Smart Stacker">
-                    <Icon name="layers" size={16} />
-                  </div>
-                  <div className="achieve-icon-box achieve-amber" title="Star Pinner">
-                    <Icon name="star" size={16} filled />
-                  </div>
-                  <div className="achieve-icon-box achieve-emerald" title="Verified Sync">
-                    <Icon name="checkCircle" size={16} />
-                  </div>
-                </div>
-              </div>
-            </div>
+                  </span>
+                  <Icon name="chevronRight" size={13} className="dashboard-collection-arrow" />
+                </button>
+              );
+            })}
           </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
-      {/* 4. Bookmarks Section or Empty State */}
+      {/* 4. Recent / Saved Bookmarks Section */}
       <section className="dashboard-main-section">
         <div className="dashboard-section-header">
           <div className="dashboard-section-title">
@@ -483,26 +327,46 @@ export function DashboardOverview({
             <span className="count-badge t-num">{totalCount}</span>
           </div>
 
-          <div className="dashboard-view-mode-tabs" role="group" aria-label="View format">
-            <button
-              type="button"
-              className={`table-view-tab ${overviewView === "table" ? "is-active" : ""}`}
-              onClick={() => setOverviewView("table")}
-            >
-              <Icon name="list" size={13} />
-              <span>Table</span>
-            </button>
-            <button
-              type="button"
-              className={`table-view-tab ${overviewView === "grid" ? "is-active" : ""}`}
-              onClick={() => setOverviewView("grid")}
-            >
-              <Icon name="grid" size={13} />
-              <span>Cards</span>
-            </button>
-          </div>
+          {totalCount > 0 ? (
+            <div className="dashboard-view-mode-tabs" role="group" aria-label="View format">
+              <button
+                type="button"
+                className={`table-view-tab ${overviewView === "grid" ? "is-active" : ""}`}
+                onClick={() => setOverviewView("grid")}
+              >
+                <Icon name="grid" size={13} />
+                <span>Cards</span>
+              </button>
+              <button
+                type="button"
+                className={`table-view-tab ${overviewView === "table" ? "is-active" : ""}`}
+                onClick={() => setOverviewView("table")}
+              >
+                <Icon name="list" size={13} />
+                <span>Table</span>
+              </button>
+            </div>
+          ) : null}
 
           <span className="spacer" />
+
+          {selectedBookmarkIds.size > 0 && overviewView === "table" ? (
+            <div className="dashboard-bulk-bar">
+              <span className="t-meta t-num">{selectedBookmarkIds.size} selected</span>
+              <button type="button" className="btn btn-sm btn-danger" onClick={handleBulkDelete}>
+                <Icon name="trash" size={12} />
+                <span>Delete</span>
+              </button>
+              <button
+                type="button"
+                className="btn btn-sm btn-quiet"
+                onClick={() => setSelectedBookmarkIds(new Set())}
+              >
+                Clear
+              </button>
+            </div>
+          ) : null}
+
           {totalCount > 0 ? (
             <button
               type="button"
@@ -519,39 +383,55 @@ export function DashboardOverview({
           <div className="dashboard-empty-card">
             <div className="dashboard-empty-hero">
               <span className="dashboard-empty-icon">
-                <Icon name="bookmark" size={24} />
+                <Icon name="sift" size={24} />
               </span>
-              <h3 className="dashboard-empty-title">Build your developer library</h3>
+              <h3 className="dashboard-empty-title">Start your developer library</h3>
               <p className="dashboard-empty-subtitle">
-                Save the websites you use every day and access them from one place.
+                Save documentation, GitHub repos, tools, and dashboards in one fast workspace.
               </p>
-              <button type="button" className="btn btn-primary" onClick={onNewBookmark}>
-                <Icon name="plus" size={14} />
-                <span>Add your first bookmark</span>
-              </button>
+              <div className="dashboard-empty-actions">
+                <button type="button" className="btn btn-primary" onClick={onNewBookmark}>
+                  <Icon name="plus" size={14} />
+                  <span>Add bookmark</span>
+                </button>
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => {
+                    loadStarterBookmarks();
+                    pushToast("Loaded starter developer bookmarks");
+                  }}
+                >
+                  <Icon name="sparkle" size={13.5} />
+                  <span>Load starter library</span>
+                </button>
+              </div>
             </div>
           </div>
         ) : overviewView === "table" ? (
-          /* SaaS Recent Bookmarks Table (inspired by ref4/ref5) */
           <div className="recent-table-card">
             <div className="recent-table-head">
               <div className="th-check" />
               <div className="th-name">Bookmark</div>
-              <div className="th-category">Stack</div>
-              <div className="th-status">Status</div>
-              <div className="th-time">Time</div>
+              <div className="th-category">Collection</div>
+              <div className="th-status">Pinned</div>
+              <div className="th-time">Updated</div>
               <div className="th-actions">Actions</div>
             </div>
             <div className="recent-table-body">
-              {lib.bookmarks.slice(0, 7).map((b) => {
-                const cat = b.categoryId ? categoryMap.get(b.categoryId) : undefined;
+              {lib.bookmarks.slice(0, 8).map((b) => {
+                const catId = b.categoryId || b.collectionId;
+                const cat = catId ? categoryMap.get(catId) : undefined;
                 const isSelected = selectedBookmarkIds.has(b.id);
                 const isFav = b.favorite || b.isFavorite;
                 return (
                   <div
                     key={b.id}
                     className={`recent-table-row ${isSelected ? "is-selected" : ""}`}
-                    onClick={() => actions.open(b)}
+                    onClick={() => {
+                      markBookmarkOpened(b.id);
+                      actions.open(b);
+                    }}
                   >
                     <div
                       className="td-check"
@@ -565,7 +445,25 @@ export function DashboardOverview({
                         });
                       }}
                     >
-                      <span className={`table-checkbox ${isSelected ? "is-checked" : ""}`}>
+                      <span
+                        className={`table-checkbox ${isSelected ? "is-checked" : ""}`}
+                        role="checkbox"
+                        aria-checked={isSelected}
+                        tabIndex={0}
+                        aria-label={`Select ${b.title}`}
+                        onKeyDown={(e) => {
+                          if (e.key === " " || e.key === "Enter") {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setSelectedBookmarkIds((prev) => {
+                              const next = new Set(prev);
+                              if (next.has(b.id)) next.delete(b.id);
+                              else next.add(b.id);
+                              return next;
+                            });
+                          }
+                        }}
+                      >
                         {isSelected ? <Icon name="check" size={10} strokeWidth={2.6} /> : null}
                       </span>
                     </div>
@@ -587,7 +485,7 @@ export function DashboardOverview({
                             className="table-cat-dot"
                             style={{ backgroundColor: cat.color || "var(--accent)" }}
                           />
-                          <span>{cat.name}</span>
+                          <span className="truncate">{cat.name}</span>
                         </span>
                       ) : (
                         <span className="table-cat-pill is-unfiled">
@@ -605,7 +503,7 @@ export function DashboardOverview({
                       ) : (
                         <span className="table-status-pill status-active">
                           <span className="status-dot" />
-                          <span>Active</span>
+                          <span>Saved</span>
                         </span>
                       )}
                     </div>
@@ -618,6 +516,7 @@ export function DashboardOverview({
                       <button
                         type="button"
                         className="table-action-btn"
+                        aria-label={isFav ? `Remove ${b.title} from favourites` : `Add ${b.title} to favourites`}
                         title={isFav ? "Remove favourite" : "Add favourite"}
                         onClick={() => actions.toggleFavorite(b.id)}
                       >
@@ -626,14 +525,16 @@ export function DashboardOverview({
                       <button
                         type="button"
                         className="table-action-btn"
-                        title="Copy link"
+                        aria-label={`Copy URL for ${b.title}`}
+                        title="Copy URL"
                         onClick={() => actions.copy(b)}
                       >
-                        <Icon name="link" size={13} />
+                        <Icon name="copy" size={12.5} />
                       </button>
                       <button
                         type="button"
                         className="table-action-btn"
+                        aria-label={`More options for ${b.title}`}
                         title="More options"
                         onClick={(e) => setMenu({ bookmark: b, anchor: e.currentTarget })}
                       >
@@ -648,7 +549,8 @@ export function DashboardOverview({
         ) : (
           <div className="grid">
             {lib.bookmarks.slice(0, 8).map((bookmark, index) => {
-              const cat = bookmark.categoryId ? categoryMap.get(bookmark.categoryId) : undefined;
+              const catId = bookmark.categoryId || bookmark.collectionId;
+              const cat = catId ? categoryMap.get(catId) : undefined;
               return (
                 <BookmarkCard
                   key={bookmark.id}
@@ -667,15 +569,15 @@ export function DashboardOverview({
         )}
       </section>
 
-      {/* 5. Curated Suggestions Section */}
+      {/* 5. Curated Developer Suggestions */}
       <section className="dashboard-suggestions-section">
         <div className="dashboard-section-header">
           <div>
             <h3 className="dashboard-section-title">
-              <span>Popular suggestions</span>
+              <span>Developer directory</span>
             </h3>
             <p className="dashboard-section-desc">
-              Curated developer tools you can instantly add to your personal library.
+              Essential documentation, tools, and platforms you can add in one click.
             </p>
           </div>
           <span className="spacer" />
@@ -694,7 +596,7 @@ export function DashboardOverview({
         </div>
 
         <div className="suggestions-grid">
-          {filteredSuggestions.slice(0, 9).map((sug) => {
+          {filteredSuggestions.slice(0, 6).map((sug) => {
             const alreadyInLibrary =
               addedSuggestions.has(sug.id) ||
               lib.bookmarks.some((b) => b.url.toLowerCase() === sug.url.toLowerCase());
@@ -727,12 +629,12 @@ export function DashboardOverview({
                     {alreadyInLibrary ? (
                       <>
                         <Icon name="check" size={12} strokeWidth={2.4} />
-                        <span>Added</span>
+                        <span>Saved</span>
                       </>
                     ) : (
                       <>
                         <Icon name="plus" size={12} />
-                        <span>Add</span>
+                        <span>Save</span>
                       </>
                     )}
                   </button>
@@ -750,7 +652,7 @@ export function DashboardOverview({
         width={220}
         entries={
           menu
-            ? buildItemEntries(menu.bookmark, actions, lib.collections, false)
+            ? buildItemEntries(menu.bookmark, actions, lib.categories, false)
             : []
         }
         onClose={() => setMenu(null)}

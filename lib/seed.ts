@@ -11,12 +11,12 @@ const DAY = 86_400_000;
 export function seedLibrary(): { bookmarks: Bookmark[]; collections: Collection[] } {
   const now = Date.now();
   const collections: Collection[] = [
-    { id: "c_docs", name: "Docs & Reference", icon: "book" },
-    { id: "c_tools", name: "Tools", icon: "wrench" },
-    { id: "c_design", name: "Design", icon: "swatch" },
-    { id: "c_infra", name: "Infra & deploys", icon: "briefcase" },
-    { id: "c_read", name: "Read later", icon: "bookmark" },
-    { id: "c_snips", name: "Snippets", icon: "code" },
+    { id: "c_docs", name: "Docs & Reference", icon: "book", color: "#6366f1" },
+    { id: "c_tools", name: "Tools", icon: "wrench", color: "#0ea5e9" },
+    { id: "c_design", name: "Design", icon: "swatch", color: "#ec4899" },
+    { id: "c_infra", name: "Infra & deploys", icon: "briefcase", color: "#10b981" },
+    { id: "c_read", name: "Read later", icon: "bookmark", color: "#f59e0b" },
+    { id: "c_snips", name: "Snippets", icon: "code", color: "#8b5cf6" },
   ];
 
   type Row = [title: string, url: string, collection: string | null, tags: string[], fav: boolean, daysAgo: number];
@@ -62,11 +62,14 @@ export function seedLibrary(): { bookmarks: Bookmark[]; collections: Collection[
     id: `b${String(index).padStart(2, "0")}`,
     title,
     url,
+    categoryId: collection,
     collectionId: collection,
     tags,
     favorite: fav,
+    isFavorite: fav,
     addedAt: Math.round(now - daysAgo * DAY),
     order: index,
+    position: index,
   }));
 
   return { bookmarks, collections };

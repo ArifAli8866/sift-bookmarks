@@ -1,6 +1,7 @@
 "use client";
 
 import type { MenuEntry } from "./Menu";
+import type { IconName } from "./Icon";
 import type { Bookmark, Collection } from "../lib/store";
 
 export interface ItemActions {
@@ -23,31 +24,38 @@ export function buildItemEntries(
   collections: Collection[],
   canReorder: boolean,
 ): MenuEntry[] {
-  const movable = collections.filter((c) => c.id !== bookmark.collectionId);
+  const currentCollectionId = bookmark.categoryId ?? bookmark.collectionId ?? null;
+  const isFav = Boolean(bookmark.favorite || bookmark.isFavorite);
+  const movable = collections.filter((c) => c.id !== currentCollectionId);
   const entries: MenuEntry[] = [
     { id: "open", label: "Open link", icon: "external", kbd: "↵", onSelect: () => actions.open(bookmark) },
     { id: "edit", label: "Edit…", icon: "pencil", kbd: "E", onSelect: () => actions.edit(bookmark.id) },
     {
       id: "fav",
-      label: bookmark.favorite ? "Remove favourite" : "Add favourite",
+      label: isFav ? "Remove favourite" : "Add favourite",
       icon: "star",
       kbd: "F",
       onSelect: () => actions.toggleFavorite(bookmark.id),
     },
-    { id: "copy", label: "Copy URL", icon: "link", onSelect: () => actions.copy(bookmark) },
+    { id: "copy", label: "Copy URL", icon: "copy", onSelect: () => actions.copy(bookmark) },
     { id: "sep1", label: "" },
     {
       id: "unfiled",
-      label: "Unfiled",
+      label: "Uncategorized",
       icon: "inbox",
       header: "Move to",
-      disabled: bookmark.collectionId === null,
+      disabled: currentCollectionId === null,
       onSelect: () => actions.assign(bookmark.id, null),
     },
   ];
 
   for (const c of movable) {
-    entries.push({ id: `move-${c.id}`, label: c.name, icon: "folder", onSelect: () => actions.assign(bookmark.id, c.id) });
+    entries.push({
+      id: `move-${c.id}`,
+      label: c.name,
+      icon: (c.icon as IconName) || "folder",
+      onSelect: () => actions.assign(bookmark.id, c.id),
+    });
   }
 
   if (canReorder) {

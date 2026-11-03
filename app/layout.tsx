@@ -7,12 +7,23 @@ import "./overlays.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Sift — bookmarks for developers",
+    default: "Sift — Bookmarks for Developers",
     template: "%s · Sift",
   },
   description:
-    "A keyboard-first place for the links you keep losing: collections, favourites, manual ordering and a command palette.",
+    "A keyboard-first bookmark manager for developers: collections, favourites, manual ordering, and an instant command palette.",
   applicationName: "Sift",
+  icons: {
+    icon: [
+      { url: "/favicon.svg?v=2", type: "image/svg+xml", sizes: "any" },
+      { url: "/favicon-32x32.png?v=2", type: "image/png", sizes: "32x32" },
+      { url: "/favicon-16x16.png?v=2", type: "image/png", sizes: "16x16" },
+      { url: "/favicon.ico?v=2", sizes: "any" },
+    ],
+    shortcut: [{ url: "/favicon.ico?v=2" }],
+    apple: [{ url: "/apple-touch-icon.png?v=2", sizes: "180x180", type: "image/png" }],
+  },
+  manifest: "/site.webmanifest",
 };
 
 export const viewport: Viewport = {

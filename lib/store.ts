@@ -1,4 +1,9 @@
 import { uid } from "./format";
+import { seedLibrary } from "./seed";
+
+const PREFS_STORAGE_KEY = "sift.prefs.v1";
+const LOCAL_LIB_STORAGE_KEY = "sift.library.v1";
+const LOCAL_MODE_STORAGE_KEY = "sift.localMode.v1";
 
 export type ViewMode = "grid" | "list";
 export type SortKey = "manual" | "added" | "title" | "domain";
@@ -100,8 +105,40 @@ function emit() {
   for (const l of listeners) l();
 }
 
+function persistLocalIfNeeded() {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(state.prefs));
+    if (state.syncStatus === "local" && state.authenticated) {
+      localStorage.setItem(
+        LOCAL_LIB_STORAGE_KEY,
+        JSON.stringify({
+          bookmarks: state.bookmarks,
+          categories: state.categories,
+          prefs: state.prefs,
+        })
+      );
+    }
+  } catch {}
+}
+
+function readStoredPrefs(): Partial<Prefs> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = localStorage.getItem(PREFS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function isCloudSynced(): boolean {
+  return state.authenticated && state.syncStatus !== "local";
+}
+
 function write(next: Partial<LibraryState>) {
   state = { ...state, ...next };
+  persistLocalIfNeeded();
   emit();
 }
 
@@ -125,13 +162,17 @@ export function getServerState(): LibraryState {
 export async function hydrate() {
   if (typeof window === "undefined") return;
 
-  write({ loading: true });
+  const storedPrefs = { ...DEFAULT_PREFS, ...readStoredPrefs() };
+  write({ loading: true, prefs: storedPrefs });
 
   try {
     const authRes = await fetch("/api/auth/me");
     if (authRes.ok) {
       const authData = await authRes.json();
       if (authData.authenticated && authData.user) {
+        try {
+          localStorage.removeItem(LOCAL_MODE_STORAGE_KEY);
+        } catch {}
         // Authenticated user: fetch their library
         const libRes = await fetch("/api/library");
         if (libRes.ok) {
@@ -146,12 +187,26 @@ export async function hydrate() {
             bookmarks: libData.bookmarks || [],
             categories,
             collections: categories,
-            prefs: libData.prefs ? { ...DEFAULT_PREFS, ...libData.prefs } : state.prefs,
+            prefs: libData.prefs ? { ...storedPrefs, ...libData.prefs } : storedPrefs,
             syncStatus: "synced",
           });
           return;
         }
       }
+    }
+
+    // Check if user opted into Local Mode
+    const isLocalMode = (() => {
+      try {
+        return localStorage.getItem(LOCAL_MODE_STORAGE_KEY) === "true";
+      } catch {
+        return false;
+      }
+    })();
+
+    if (isLocalMode) {
+      enterLocalMode(false);
+      return;
     }
 
     // Unauthenticated
@@ -164,6 +219,7 @@ export async function hydrate() {
       bookmarks: [],
       categories: [],
       collections: [],
+      prefs: storedPrefs,
       syncStatus: "synced",
     });
   } catch (err) {
@@ -176,13 +232,74 @@ export async function hydrate() {
       bookmarks: [],
       categories: [],
       collections: [],
+      prefs: storedPrefs,
       syncStatus: "error",
     });
   }
 }
 
+export function enterLocalMode(seedIfEmpty = true) {
+  if (typeof window === "undefined") return;
+  const storedPrefs = { ...DEFAULT_PREFS, ...readStoredPrefs() };
+  let bookmarks: Bookmark[] = [];
+  let categories: Category[] = [];
+
+  try {
+    localStorage.setItem(LOCAL_MODE_STORAGE_KEY, "true");
+    const raw = localStorage.getItem(LOCAL_LIB_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      bookmarks = Array.isArray(parsed.bookmarks) ? parsed.bookmarks : [];
+      categories = Array.isArray(parsed.categories) ? parsed.categories : [];
+    } else if (seedIfEmpty) {
+      const seeded = seedLibrary();
+      bookmarks = seeded.bookmarks;
+      categories = seeded.collections;
+    }
+  } catch {}
+
+  write({
+    hydrated: true,
+    loading: false,
+    authenticated: true,
+    user: {
+      id: "local",
+      name: "Local Workspace",
+      email: "Stored in browser",
+    },
+    onboarded: true,
+    bookmarks,
+    categories,
+    collections: categories,
+    prefs: storedPrefs,
+    syncStatus: "local",
+  });
+}
+
+export function loadStarterBookmarks() {
+  const seeded = seedLibrary();
+  const existingUrls = new Set(state.bookmarks.map((b) => b.url));
+  const existingCatIds = new Set(state.categories.map((c) => c.id));
+  const nextCategories = [
+    ...state.categories,
+    ...seeded.collections.filter((c) => !existingCatIds.has(c.id)),
+  ];
+  const nextBookmarks = [
+    ...state.bookmarks,
+    ...seeded.bookmarks.filter((b) => !existingUrls.has(b.url)),
+  ];
+  write({
+    categories: nextCategories,
+    collections: nextCategories,
+    bookmarks: nextBookmarks,
+  });
+  if (isCloudSynced()) {
+    syncToCloud();
+  }
+}
+
 export async function syncToCloud(): Promise<boolean> {
-  if (!state.authenticated) return false;
+  if (!isCloudSynced()) return false;
   try {
     write({ syncStatus: "syncing" });
     const res = await fetch("/api/library", {
@@ -279,7 +396,12 @@ export async function loginWithGoogle(profile?: {
 
 export async function logoutUser(): Promise<void> {
   try {
-    await fetch("/api/auth/logout", { method: "POST" });
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(LOCAL_MODE_STORAGE_KEY);
+    }
+    if (isCloudSynced()) {
+      await fetch("/api/auth/logout", { method: "POST" });
+    }
   } catch {}
   write({
     authenticated: false,
@@ -288,6 +410,7 @@ export async function logoutUser(): Promise<void> {
     categories: [],
     collections: [],
     scope: { kind: "overview" },
+    syncStatus: "synced",
   });
 }
 
@@ -296,6 +419,10 @@ export async function finishOnboarding(payload: {
   bookmarks?: any[];
   skipped?: boolean;
 }): Promise<boolean> {
+  if (!isCloudSynced()) {
+    write({ onboarded: true });
+    return true;
+  }
   try {
     const res = await fetch("/api/auth/onboarding", {
       method: "POST",
@@ -315,6 +442,10 @@ export async function finishOnboarding(payload: {
 
 export async function updateProfile(patch: { name?: string; image?: string }): Promise<boolean> {
   if (!state.user) return false;
+  if (!isCloudSynced()) {
+    write({ user: { ...state.user, ...patch } });
+    return true;
+  }
   try {
     const res = await fetch("/api/settings", {
       method: "PUT",
@@ -445,7 +576,7 @@ export function setQuery(query: string) {
 
 export function setPrefs(patch: Partial<Prefs>) {
   write({ prefs: { ...state.prefs, ...patch } });
-  if (state.authenticated) {
+  if (isCloudSynced()) {
     fetch("/api/settings", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -488,7 +619,7 @@ export function addBookmark(input: {
 
   write({ bookmarks: [bookmark, ...state.bookmarks] });
 
-  if (state.authenticated) {
+  if (isCloudSynced()) {
     fetch("/api/bookmarks", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -504,7 +635,7 @@ export function updateBookmark(id: string, patch: Partial<Omit<Bookmark, "id">>)
     bookmarks: state.bookmarks.map((b) => (b.id === id ? { ...b, ...patch } : b)),
   });
 
-  if (state.authenticated) {
+  if (isCloudSynced()) {
     fetch(`/api/bookmarks/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -530,7 +661,7 @@ export function deleteBookmarks(ids: string[]): Bookmark[] {
 
   write({ bookmarks: state.bookmarks.filter((b) => !ids.includes(b.id)) });
 
-  if (state.authenticated) {
+  if (isCloudSynced()) {
     for (const id of ids) {
       fetch(`/api/bookmarks/${id}`, { method: "DELETE" }).catch(() => {});
     }
@@ -544,7 +675,7 @@ export function restoreBookmarks(removed: Bookmark[]) {
   const toAdd = removed.filter((b) => !existing.has(b.id));
   write({ bookmarks: [...state.bookmarks, ...toAdd] });
 
-  if (state.authenticated) {
+  if (isCloudSynced()) {
     for (const b of toAdd) {
       fetch("/api/bookmarks", {
         method: "POST",
@@ -561,7 +692,7 @@ export function markBookmarkOpened(id: string) {
     bookmarks: state.bookmarks.map((b) => (b.id === id ? { ...b, lastOpenedAt: now } : b)),
   });
 
-  if (state.authenticated) {
+  if (isCloudSynced()) {
     fetch(`/api/bookmarks/${id}/open`, { method: "POST" }).catch(() => {});
   }
 }
@@ -612,7 +743,7 @@ export function addCategory(name: string, icon = "folder", color = "#0a7aff"): C
   const nextCategories = [...state.categories, category];
   write({ categories: nextCategories, collections: nextCategories });
 
-  if (state.authenticated) {
+  if (isCloudSynced()) {
     fetch("/api/categories", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -630,7 +761,7 @@ export function updateCategory(id: string, patch: Partial<Omit<Category, "id">>)
   );
   write({ categories: nextCategories, collections: nextCategories });
 
-  if (state.authenticated) {
+  if (isCloudSynced()) {
     fetch(`/api/categories/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -662,7 +793,7 @@ export function deleteCategory(id: string) {
     scope: scopeGone ? { kind: "overview" } : state.scope,
   });
 
-  if (state.authenticated) {
+  if (isCloudSynced()) {
     fetch(`/api/categories/${id}`, { method: "DELETE" }).catch(() => {});
   }
 }

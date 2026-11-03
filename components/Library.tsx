@@ -291,6 +291,9 @@ export function Library({
     if (key === "f") {
       e.preventDefault();
       actions.toggleFavorite(bookmark.id);
+    } else if (key === "c") {
+      e.preventDefault();
+      actions.copy(bookmark);
     } else if (key === "e") {
       e.preventDefault();
       actions.edit(bookmark.id);
@@ -309,8 +312,8 @@ export function Library({
     );
   }
 
-  // OVERVIEW DASHBOARD (Default view matching Dribbble inspiration)
-  if (lib.scope.kind === "overview") {
+  // OVERVIEW DASHBOARD (shown when in overview scope and not actively filtering)
+  if (lib.scope.kind === "overview" && !querying) {
     return (
       <div className="content">
         <DashboardOverview
